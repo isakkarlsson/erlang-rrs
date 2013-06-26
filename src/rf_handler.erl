@@ -21,10 +21,11 @@ websocket_init(_TransportName, Req, _Opts) ->
 						 {progress, fun (X, Y) -> 
 								    Self ! {msg, io_lib:format("~p of ~p trees done", [X, Y])}
 							    end}]),
-		  rr_eval:cross_validation(Features, Examples, ExConf,
-					   [{build, Build}, 
-					    {evaluate, rf:killer(Evaluate)}, 
-					    {progress, fun (Fold) -> Self ! {msg, io_lib:format("Fold ~p", [Fold])} end}])
+		  R = rr_eval:cross_validation(Features, Examples, ExConf,
+					       [{build, Build}, 
+						{evaluate, rf:killer(Evaluate)}, 
+						{progress, fun (Fold) -> Self ! {msg, io_lib:format("Fold ~p", [Fold])} end}]),
+		  Self ! {result, R}
 	  end),
     {ok, Req, undefined_state}.
 
@@ -35,6 +36,8 @@ websocket_handle(_Data, Req, State) ->
 
 websocket_info({msg, Msg}, Req, State) ->
     {reply, {text, Msg}, Req, State};
+websocket_info({result, R}, Req, State) ->
+    {reply, {text, jiffy:encode(R)}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
