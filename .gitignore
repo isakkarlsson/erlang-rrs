@@ -9,4 +9,4 @@ ebin/
 doc/
 *.DS_STORE
 erl_crash.dump
-rr
+rrrr_server
