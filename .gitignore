@@ -1,0 +1,12 @@
+.eunit
+deps
+*.o
+*.beam
+*.plt
+*~
+src/*nonode*
+ebin/
+doc/
+*.DS_STORE
+erl_crash.dump
+rr
