@@ -1,7 +1,8 @@
 -module(rr_server).
 -export([main/1]).
 
-main(_StartType) ->
+%% @doc entry point for the server
+main(_Args) ->
     ok = application:start(crypto),
     ok = application:start(ranch),
     ok = application:start(cowboy),
@@ -11,6 +12,8 @@ main(_StartType) ->
 		   {'_', [{"/rf", rf_handler, []}]}
 		 ]
 		),
+
+
     %% Name, NbAcceptors, TransOpts, ProtoOpts
     cowboy:start_http(my_http_listener, 100,
 		      [{port, 8080}],
