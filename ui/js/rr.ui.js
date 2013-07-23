@@ -31,6 +31,10 @@ $(document).ready(function() {
 	});
     });
 
+    $("#ml-confirm").click(function(evt) {
+	deck.next();
+    });
+
     $(".help").each(function() {
 	var help = $(this);
 	if($(help).attr("show") == "true") {

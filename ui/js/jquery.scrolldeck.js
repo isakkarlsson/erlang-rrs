@@ -192,10 +192,15 @@
 			points.sort(function(a,b){return a - b;});
 			return points[points.indexOf(scrollTop)+n];
 		}
-		
-		
+	var next = function() {
+	    scrollToSlide(getNextScrollpoint())
+	};
+	var prev = function() {
+	    scrollToSlide(getPrevScrollpoint());
+	}
 		// INIT
 		init();
+	return {next: next, prev: prev};
     };
      
 })(jQuery);
