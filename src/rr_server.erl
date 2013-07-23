@@ -9,7 +9,16 @@ main(_Args) ->
     rr_log:new(std_err, debug),
     Dispatch = cowboy_router:compile(
 		 [ 
-		   {'_', [{"/rf", rf_handler, []}]}
+		   {'_', [
+			  {"/api/rf", rf_handler, []},
+			  {"/api/file", file_handler, []},
+			  {"/[...]", cowboy_static, 
+			   [
+			    {directory, "priv"},
+			    {mimetypes, {fun mimetypes:path_to_mimes/2, default}}
+			    ]}
+						     
+			 ]}
 		 ]
 		),
 

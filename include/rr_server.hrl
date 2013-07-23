@@ -7,6 +7,6 @@
 
 %% @doc 
  -record(rr_state, {
-	   id = 0:: number()
+	   current = 0 :: number()
 	  }).
 	   

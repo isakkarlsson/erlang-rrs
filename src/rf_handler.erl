@@ -14,19 +14,24 @@ init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_TransportName, Req, _Opts) ->
-    self() ! {msg, "loading file.."},
-    {ok, Req, #rr_state{}}. %% init with some sort of state 
+    self() ! {progress, 0},
+    {ok, Req, #rr_state{current=0}}. %% init with some sort of state 
 
-websocket_handle({text, Msg}, Req, State) ->
-    rr_log:info("~p ~n", [State]),
-    {reply, {text, << "That's what she said! ", Msg/binary >>}, Req, State};
+websocket_handle({text, Json}, Req, State) ->
+    Obj = (catch jsx:decode(Json)),
+    {Resp, NewState} = websocket_handle_(Obj, State),
+    {reply, {text, json_reply(response, Resp)}, Req, NewState};
 websocket_handle(_Data, Req, State) ->
     {ok, Req, State}.
 
-websocket_info({msg, Msg}, Req, State) ->
-    {reply, {text, json_reply(message, [{text, sanitize_value(Msg)}])}, Req, State};
-websocket_info({result, R}, Req, State) ->
-    {reply, {text, json_reply(result, R)}, Req, State};
+websocket_handle_(Obj, State) ->
+    rr_log:info("~p~p ~n", [Obj, State]),
+    {[{started, <<"job x2>>">>}], State#rr_state{current=State#rr_state.current + 1}}.
+    
+websocket_info({progress, Msg}, Req, State) ->
+    {reply, {text, json_reply(progress, [{value, sanitize_value(Msg)}])}, Req, State};
+websocket_info({completed, R}, Req, State) ->
+    {reply, {text, json_reply(completed, R)}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
