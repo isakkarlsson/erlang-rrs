@@ -3,6 +3,7 @@
     <title>rr</title>
     <link href="css/main.css" rel="stylesheet" />
     <link href="css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/chosen.min.css">
 
     <script src="js/jquery-1.9.1.js"></script>
     <script src="js/jquery-migrate-1.2.1.min.js"></script>
@@ -12,6 +13,8 @@
     <script src="js/jquery.scrollorama.js"></script>
     <script src="js/jquery.easing.1.3.js"></script>
     <script src="js/jquery.scrolldeck.js"></script>
+
+    <script src="js/chosen.jquery.min.js" type="text/javascript"></script>
 
     <script src="js/rr.ui.js"></script>
   </head>
@@ -35,13 +38,14 @@
 
 
     <div class="slide" id="build">
+      
       <div class="main">
+	<h1>Select Machine Learning Algorithm</h1>
 	<div class="main-contents">
 	  <div class="build-main-container">
 	    <div class="select-group">
 	      <div class="select">
-		<div id="ml-selector" class="selector">
-		  <span class="selector-text">Machine Learner</span>
+		<div id="ml-selector" class="selector inner-shadow">
 		  <div class="methods">
 		    <ul>
 		      <li>
@@ -52,46 +56,65 @@
 		      </li>
 		    </ul>
 		  </div>
+		  <div class="outer-shadow"></div>
 		</div>
 		<div id="ml-lip" class="selector-lip" >
-		  <h2>  </h2>
-		  <table class="attributes">
+		  <h2>Attributes</h2>
+		  <table class="attributes inner-shadow">
 		    <tr>
-		      <td class="attr-key">Number of trees</td><td class="attr-value">.....</td>
+		      <td class="attr-key">
+			<span class="help" key="no-trees" help="Select the number of trees to build" show="true">
+			  Number of trees
+			</span>
+		      </td>
+		      <td class="attr-value">
+			<div id="no-trees" class="slider" min="1" max="1000" default="100"></div>
+		      </td>
+		      <td class="attr-key">
+			<span id="no-trees-current">100</span>
+		      </td>
 		    </tr>		    
 		    <tr>
-		      <td class="attr-key">Number of attributes</td><td class="attr-value">.....</td>
+		      <td class="attr-key">
+			<span class="help" key="no-features" help="Select the number of attributes to inspect at each branch (default is log2(no-features)+1)" show="true">
+			  Number of attributes
+			</span>
+		      </td>
+		      <td class="attr-value">
+			<div id="no-features" class="slider" min="1" max="10" default="4"></div>
+		      </td>
+		      <td class="attr-key">
+			<span id="no-features-current">4</span>
+		      </td>
 		    </tr>
+		    <tr>
+		      <td class="attr-key">
+			<span class="help" key="missing-values" help="Select a way for handling missing values" show="true">
+			  Handle missing values
+			</span>
+		      </td>
+		      <td class="attr-value">
+			<select data-paceholder="Select a value" class="choice">
+			  <option value="weighted">Weighted distribution</option>
+			  <option value="random">Random distribution</option>
+			</select>
+		      </td>
+		      <td class="attr-key">
+		      </td>
+		    </tr>
+		    
 		  </table>
+		  <div class="selector-lip-foot">
+		    <a href="#" class="selector-button confirm inner-shadow help" key="confirm" help="Confirm attribute selection and continue to evaluation selection">Confirm</a>
+		    <a href="#" class="selector-button clear inner-shadow help" key="reset" help="Rest attributes to their default values">Reset attributes</a>
+		  </div>
 		</div>
 	      </div>
 	    </div>
 
-	    <div class="select-group">
-	      <div class="select outer-shadow">
-		<div id="eval-selector" class="selector">
-		  <span class="selector-text">Evaluation</span>
-		</div>
-		<div id="eval-lip" class="selector-lip" style="display: none" >
-		  dsa
-		</div>
-	      </div>
-	    </div>
 	  </div>
-	  <div class="build-information">
-	    <div class="build-information-bubble outer-shadow">
-	      <div class="build-information-bubble-head">
-		<h3>
-		  Warning: Test
-		</h3>
-	      </div>
-	      <div class="build-information-bubble-contents">
-		<p>
-		  dsa
-		</p>
-	      </div>
-	    </div>
-	    
+	  <div id="build-information">
+	    	    
 	  </div>
 	</div>
       </div>
