@@ -10,7 +10,6 @@ $(document).ready(function() {
     var data = ["Random Forest"];
 
     $(".method").click(slider("#ml-lip"));
-    $("#eval-selector").click(slider("#eval-lip"));
 
     $(".slider").each(function () {
 	$(this).slider({
@@ -33,6 +32,10 @@ $(document).ready(function() {
 
     $("#ml-confirm").click(function(evt) {
 	deck.next();
+    });
+
+    $(".prev").click(function(e) {
+	deck.prev();
     });
 
     $(".help").each(function() {
