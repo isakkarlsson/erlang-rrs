@@ -41,9 +41,6 @@ $(document).ready(function() {
 	    var msg = $(help).attr("help");
 	    $(build).prepend(""+
 "<div class='build-information-bubble'>" +
-"  <div class='build-information-bubble-head'>" +
-"    <h3>Information</h3> " +
-"  </div> " + 
 "  <div class='build-information-bubble-contents'>"+
 "   <p> " + msg + "</p> " +
 "  </div> " +

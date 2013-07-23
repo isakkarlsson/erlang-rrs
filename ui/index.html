@@ -25,7 +25,7 @@
     <div id="top-panel">
       <ul class="top-menu">
 	<li>
-	  <a href="#build" class="nav-button">Build</a>
+	  <a href="#build" class="nav-button">Machine Learner</a>
 	</li>
 	<li>
 	  <a href="#help" class="nav-button">Help</a>
@@ -45,18 +45,17 @@
 	  <div class="build-main-container">
 	    <div class="select-group">
 	      <div class="select">
-		<div id="ml-selector" class="selector inner-shadow">
-		  <div class="methods">
-		    <ul>
-		      <li>
-			<a href="#" class="method" id="rf">Random Forest</a>
-		      </li>
-		      <li>
-			<a href="#" class="method" id="rfr">Random Rule Forest</a>
-		      </li>
-		    </ul>
-		  </div>
-		  <div class="outer-shadow"></div>
+		<div id="ml-selector" class="selector outer-shadow inner-shadow">
+		  <ul>
+		    <li>
+		      <a href="#" class="method help" id="rf"
+			 help="Select the random forest algorithm">Random Forest</a>
+		    </li>
+		    <li>
+		      <a href="#" class="method help" id="rfr"
+			 help="Select the random rule forest algorithm">Random Rule Forest</a>
+		    </li>
+		  </ul>
 		</div>
 		<div id="ml-lip" class="selector-lip" >
 		  <h2>Attributes</h2>
@@ -113,15 +112,13 @@
 	    </div>
 
 	  </div>
-	  <div id="build-information">
-	    	    
-	  </div>
 	</div>
-      </div>
-      
-      
+      </div>      
     </div>
+    <div class="slide">
 
+    </div>
+    
     <div class="slide" id="help">
       <div class="main">
 	<h1>Help</h1>
@@ -135,6 +132,7 @@
       </div>
     </div>
     
-
+    <div id="build-information">
+    </div>	
   </body>
 </html>
