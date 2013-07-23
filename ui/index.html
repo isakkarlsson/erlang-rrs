@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <title>rr</title>
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/jquery-migrate-1.2.1.min.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.js"></script>
+
+    <script src="js/jquery.scrollTo-1.4.3.1.min.js"></script>
+    <script src="js/jquery.scrollorama.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
+    <script src="js/jquery.scrolldeck.js"></script>
+
+    <script src="js/rr.ui.js"></script>
+  </head>
+
+  <script>
+  </script>
+  <body>
+    <div id="top-panel">
+      <ul class="top-menu">
+	<li>
+	  <a href="#build" class="nav-button">Build</a>
+	</li>
+	<li>
+	  <a href="#help" class="nav-button">Help</a>
+	</li>
+	<li>
+	  <a href="#about" class="nav-button">About</a>
+	</li>
+      </ul>
+    </div>
+
+
+    <div class="slide" id="build">
+      <div class="main">
+	<div class="main-contents">
+	  <div class="build-main-container">
+	    <div class="select-group">
+	      <div class="select">
+		<div id="ml-selector" class="selector">
+		  <span class="selector-text">Machine Learner</span>
+		  <div class="methods">
+		    <ul>
+		      <li>
+			<a href="#" class="method" id="rf">Random Forest</a>
+		      </li>
+		      <li>
+			<a href="#" class="method" id="rfr">Random Rule Forest</a>
+		      </li>
+		    </ul>
+		  </div>
+		</div>
+		<div id="ml-lip" class="selector-lip" >
+		  <h2>  </h2>
+		  <table class="attributes">
+		    <tr>
+		      <td class="attr-key">Number of trees</td><td class="attr-value">.....</td>
+		    </tr>		    
+		    <tr>
+		      <td class="attr-key">Number of attributes</td><td class="attr-value">.....</td>
+		    </tr>
+		  </table>
+		</div>
+	      </div>
+	    </div>
+
+	    <div class="select-group">
+	      <div class="select outer-shadow">
+		<div id="eval-selector" class="selector">
+		  <span class="selector-text">Evaluation</span>
+		</div>
+		<div id="eval-lip" class="selector-lip" style="display: none" >
+		  dsa
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="build-information">
+	    <div class="build-information-bubble outer-shadow">
+	      <div class="build-information-bubble-head">
+		<h3>
+		  Warning: Test
+		</h3>
+	      </div>
+	      <div class="build-information-bubble-contents">
+		<p>
+		  dsa
+		</p>
+	      </div>
+	    </div>
+	    
+	  </div>
+	</div>
+      </div>
+      
+      
+    </div>
+
+    <div class="slide" id="help">
+      <div class="main">
+	<h1>Help</h1>
+	<p>help me!</p>
+      </div>
+    </div>
+
+    <div class="slide" id="about">
+      <div class="main">
+	<p> Hello world! </p>
+      </div>
+    </div>
+    
+
+  </body>
+</html>
