@@ -15,17 +15,24 @@
     <script src="js/jquery.scrolldeck.js"></script>
 
     <script src="js/chosen.jquery.min.js" type="text/javascript"></script>
-
+    <script src="js/jquery.BlockUI.js" type="text/javascript"></script>
+    <script src="js/jquery.json-2.4.min.js" type="text/javascript"></script>    
     <script src="js/rr.ui.js"></script>
   </head>
 
   <script>
   </script>
   <body>
-    <div id="top-panel">
+    <div id="top-panel" class="gray">
       <ul class="top-menu">
 	<li>
-	  <a href="#build" class="nav-button">Machine Learner</a>
+	  <a href="#dataset" class="nav-button">1. Dataset</a>
+	</li>
+	<li>
+	  <a href="#build" class="nav-button">2. Machine Learner</a>
+	</li>
+	<li>
+	  <a href="#eval" class="nav-button">3. Evaluation</a>
 	</li>
 	<li>
 	  <a href="#help" class="nav-button">Help</a>
@@ -35,102 +42,91 @@
 	</li>
       </ul>
     </div>
+    
+    <!-- <div id="machine-learner-message" class="message-container"> -->
+    <!--   <div id="select-machine-learner" class="message gray inner-shadow"> -->
+    <!-- 	<h2>Step 1</h2> -->
+    <!-- 	<p> -->
+    <!-- 	  Select a data set -->
+    <!-- 	</p> -->
+    <!--   </div> -->
+    <!--   <div id="select-machine-learner" class="message gray inner-shadow"> -->
+    <!-- 	<h2>Step 2</h2> -->
+    <!-- 	<p> -->
+    <!-- 	  Select machine learning algorithm -->
+    <!-- 	</p> -->
+    <!--   </div> -->
+    <!--   <div id="select-evaluation" class="message gray inner-shadow"> -->
+    <!-- 	<h2>Step 3</h2> -->
+    <!-- 	<p> -->
+    <!-- 	  Select the evaluation technique -->
+    <!-- 	</p> -->
+    <!--   </div> -->
+    <!--   <div id="run-model" class="message gray inner-shadow"> -->
+    <!-- 	<h2>Step 4</h2> -->
+    <!-- 	<p> -->
+    <!-- 	  Run the selected model and inspect the result -->
+    <!-- 	</p> -->
+    <!--   </div> -->
+    <!-- </div> -->
 
-
+    <div class="slide" id="dataset">
+      <div class="main">
+	<h1>Select input Data Set</h1>
+	<div class="main-contents">
+	  <div id="files" class="files">
+	    <select data-placeholder="Select a dataset" class="choice files-choice">
+	      <option value=""></option>
+	    </select>
+	  </div>
+	  <div class="files-foot">
+	    <a href="#" id="files-confirm" class="selector-button confirm gray inner-shadow">
+	      Confirm
+	    </a>
+	  </div>
+	</div>
+      </div>
+    </div>
+    
     <div class="slide" id="build">
-      
       <div class="main">
 	<h1>Select Machine Learning Algorithm</h1>
 	<div class="main-contents">
 	  <div class="build-main-container">
 	    <div class="select-group">
 	      <div class="select">
-		<div id="ml-selector" class="selector outer-shadow inner-shadow">
+		<div id="ml-selector" class="selector orange inner-shadow">
 		  <ul>
-		    <li>
-		      <a href="#" class="method help" id="rf"
-			 help="Select the random forest algorithm">Random Forest</a>
-		    </li>
-		    <li>
-		      <a href="#" class="method help" id="rfr"
-			 help="Select the random rule forest algorithm">Random Rule Forest</a>
-		    </li>
+		   
 		  </ul>
 		</div>
-		<div id="ml-lip" class="selector-lip" >
+		<div id="ml-lip" class="selector-lip" style="display: none">
 		  <h2>Attributes</h2>
 		  <table class="attributes inner-shadow">
-		    <tr>
-		      <td class="attr-key">
-			<span class="help" key="no-trees" help="Select the number of trees to build" show="true">
-			  Number of trees
-			</span>
-		      </td>
-		      <td class="attr-value">
-			<div id="no-trees" class="slider" min="1" max="1000" default="100"></div>
-		      </td>
-		      <td class="attr-key">
-			<span id="no-trees-current">100</span>
-		      </td>
-		    </tr>		    
-		    <tr>
-		      <td class="attr-key">
-			<span class="help" key="no-features" help="Select the number of attributes to inspect at each branch (default is log2(no-features)+1)" show="true">
-			  Number of attributes
-			</span>
-		      </td>
-		      <td class="attr-value">
-			<div id="no-features" class="slider" min="1" max="10" default="4"></div>
-		      </td>
-		      <td class="attr-key">
-			<span id="no-features-current">4</span>
-		      </td>
-		    </tr>
-		    <tr>
-		      <td class="attr-key">
-			<span class="help" key="missing-values" help="Select a way for handling missing values" show="true">
-			  Handle missing values
-			</span>
-		      </td>
-		      <td class="attr-value">
-			<select data-paceholder="Select a value" class="choice">
-			  <option value="weighted">Weighted distribution</option>
-			  <option value="random">Random distribution</option>
-			</select>
-		      </td>
-		      <td class="attr-key">
-		      </td>
-		    </tr>
 		  </table>
 		  <div class="selector-lip-foot">
-		    <a href="#" id="ml-confirm" class="selector-button confirm inner-shadow help" key="confirm" help="Confirm attribute selection and continue to evaluation selection">Confirm</a>
-		    <a href="#" class="selector-button clear inner-shadow help" key="reset" help="Rest attributes to their default values">Reset attributes</a>
+		    <a href="#" id="ml-back" class="selector-button red prev inner-shadow">Back</a>
+		    <a href="#" id="ml-confirm" class="selector-button confirm gray inner-shadow help" key="confirm"
+		       help="Confirm attribute selection and continue to evaluation selection">
+		      Confirm
+		    </a>
 		  </div>
 		</div>
 	      </div>
 	    </div>
-
 	  </div>
 	</div>
       </div>      
     </div>
-    <div class="slide">
+    <div class="slide" id="eval">
       <div class="main">
 	<h1>Select Evaluation Technique</h1>
 	<div class="main-contents">
 	  <div class="build-main-container">
 	    <div class="select-group">
 	      <div class="select">
-		<div id="eval-selector" class="selector outer-shadow inner-shadow">
+		<div id="eval-selector" class="selector orange inner-shadow">
 		  <ul>
-		    <li>
-		      <a href="#" class="method help" id="cv"
-			 help="Evaluate using cross-validation">Cross Validation</a>
-		    </li>
-		    <li>
-		      <a href="#" class="method help" id="split"
-			 help="Select the random rule forest algorithm">Split Validation</a>
-		    </li>
 		  </ul>
 		</div>
 		<div id="eval-lip" class="selector-lip" >
@@ -139,10 +135,11 @@
 		    
 		  </table>
 		  <div class="selector-lip-foot">
-		    <a href="#" id="eval-back" class="selector-button prev inner-shadow">Back</a>
-		    <a href="#" id="eval-confirm" class="selector-button confirm inner-shadow help" key="confirm" 
-		       help="Confirm attribute selection and continue to evaluation selection">Confirm</a>
-		    <a href="#" class="selector-button clear inner-shadow help" key="reset" help="Rest attributes to their default values">Reset attributes</a>
+		    <a href="#" id="eval-back" class="selector-button red prev inner-shadow">Back</a>
+		    <a href="#" id="eval-confirm" class="selector-button confirm gray inner-shadow help" key="confirm"
+		       help="Confirm attribute selection and continue to evaluation selection">
+		      RUN
+		    </a>
 		  </div>
 		</div>
 	      </div>
@@ -150,6 +147,7 @@
 	  </div>
 	</div>
       </div>
+    </div>
     
     <div class="slide" id="help">
       <div class="main">

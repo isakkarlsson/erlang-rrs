@@ -14,6 +14,7 @@ init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_TransportName, Req, _Opts) ->
+    process_flag(trap_exit, true),
     self() ! {progress, 0},
     {ok, Req, #rr_state{current=0}}. %% init with some sort of state 
 
@@ -25,18 +26,20 @@ websocket_handle(_Data, Req, State) ->
     {ok, Req, State}.
 
 websocket_handle_(Obj, State) ->
-    rr_log:info("~p~p ~n", [Obj, State]),
-    {[{started, <<"job x2>>">>}], State#rr_state{current=State#rr_state.current + 1}}.
+    Process = spawn_model(Obj),
+    {[{started, <<"job x2>>">>}], State#rr_state{current=Process}}.
     
 websocket_info({progress, Msg}, Req, State) ->
     {reply, {text, json_reply(progress, [{value, sanitize_value(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
+    rr_db:put_json(R),
     {reply, {text, json_reply(completed, R)}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(_Reason, _Req, _State) ->
-    rr_log:info("client is terminating.."),
+websocket_terminate(_Reason, _Req, State) ->
+    Process = State#rr_state.current,
+    exit(Process, normal),
     ok.
 
 json_reply(Method, Data) ->
@@ -70,7 +73,14 @@ sanitize_value(V) when is_list(V) ->
 sanitize_value(V) ->
     V.
 
-
+spawn_model(Props) ->
+    rr_log:info("~p ~n", [Props]),
+    spawn(fun () ->
+		  receive
+		      d ->
+			  ok
+		  end
+	  end).
 
 
 %% spawn(fun() ->

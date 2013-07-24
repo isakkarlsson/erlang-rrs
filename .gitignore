@@ -11,3 +11,6 @@ doc/
 erl_crash.dump
 rr
 rr_server
+Mnesia*
+priv
+src/*#

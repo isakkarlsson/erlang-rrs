@@ -197,10 +197,16 @@
 	};
 	var prev = function() {
 	    scrollToSlide(getPrevScrollpoint());
-	}
-		// INIT
-		init();
-	return {next: next, prev: prev};
+	};
+	var toId = function (id) {
+	    var slide = $(id);
+	    currIndex = slide.index();
+	    scrollToSlide(slide);
+	};
+
+	// INIT
+	init();
+	return {next: next, prev: prev, toId: toId};
     };
      
 })(jQuery);
