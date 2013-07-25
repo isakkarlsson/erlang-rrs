@@ -7,9 +7,11 @@ $(document).ready(function() {
 	    } 
 	});
     };
-
     block("#eval .main, #build .main");
-
+    $("#progress-bar").progressbar({value:30});
+    // $("#top-panel").block({
+    // 	message: $("#progress-dialog")
+    // });
     var deck = new $.scrolldeck({
         buttons: '.nav-button'
     });
