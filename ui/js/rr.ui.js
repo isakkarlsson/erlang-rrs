@@ -1,15 +1,4 @@
 $(document).ready(function() {
-<<<<<<< HEAD
-    var block = function (id) {
-	$(id).block({
-	    message: "<h1>You must complete the previous step first!</h1>",
-	    css: {
-		cursor: 'default'
-	    } 
-	});
-    };
-=======
->>>>>>> 00170abde6bc33bb4848387df4b0964ce552ad06
     block("#eval .main, #build .main");
     $("#progress-bar").progressbar({value:30});
     // $("#top-panel").block({
@@ -325,10 +314,48 @@ function slider(lip) {
 }
 
 function runModel(payload) {
-    alert($.toJSON(payload));
+    var send = $.toJSON(payload);
     block("#dataset .main, #build .main", 
 	  "<h1>Working! Please wait...</h1>");
+    $("#progressbar").progressbar({
+	value: 34,
+	min: 0,
+	max: 100
+    });
+    block("#eval .main", $("#progress"));
+    var socket = new WebSocket("ws://127.0.0.1:8080/api/rf");
+    socket.onmessage = function (msg) {
+	var data = $.parseJSON(msg.data);
+	if(data.type == "progress") {
+	    handleProgress(data.data);
+	} else if(data.type == "completed") {
+	    handleCompleted(data.data);
+	    socket.close();
+	} else if(data.type == "message") {
+	    handleMessage(data.data);
+	} else {
+	    alert("Something ain't right!");
+	}
+    };
+    socket.onopen = function(evt) {
+	socket.send(send);
+    };
 }
+
+function handleMessage(data) {
+    var msg = data.text;
+    $("#progress-text p").html(msg);    
+}
+
+function handleProgress(data) {
+    $("#progressbar").progressbar("value", data.value);
+}
+
+function handleCompleted(data) {
+    var id = data.result_id;
+    window.location.replace("/result.html?id=" + id);
+}
+
 
 function block(id, message) {
     message = message || "<h1>You must complete the previous step first!</h1>";

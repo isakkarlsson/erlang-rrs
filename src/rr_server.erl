@@ -19,6 +19,7 @@ main(_Args) ->
 			  {"/api/evaluator/get-all", eval_get_all_handler, []},
 			  {"/api/machine-learning/get-all", ml_get_all_handler, []},
 			  {"/api/machine-learning/get/:id", ml_get_handler, []},
+			  {"/api/result/get/:id", result_get_handler, []},
 			  
 			  {"/[...]", cowboy_static, 
 			   [

@@ -30,15 +30,23 @@ put_json(Json) ->
     T = fun() ->
 		Id = next_int(),
 		New = #result{id=Id, json=Json},
-		mnesia:write(New)
+		mnesia:write(New),
+		Id
+		    
 	end,
     {atomic, Val} = mnesia:transaction(T),
     Val.
+
    
 get_json(Id) ->
     F = fun() -> mnesia:read(result, Id, read) end,
     {atomic, Val} = mnesia:transaction(F),
-    Val.
+    case Val of
+	[] ->
+	    not_found;
+	[#result{json=Data}|_] ->
+	    Data
+    end.
 
 next_int() ->
     mnesia:dirty_update_counter(counter, id, 1).

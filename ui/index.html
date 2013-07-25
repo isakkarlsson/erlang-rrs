@@ -23,14 +23,16 @@
   <script>
   </script>
 
-  <div id="progress" style="display:none">
-    <div id="progressbar"></div>
-  </div>
   <body>
-    <div id="progress-dialog" style="display:none">
-      <div style="padding: 20px" id="progress-bar"></div>
+    <div id="progress" style="display:none">
+      <h2>Please wait!</h2>
+      <div style="margin: 20px" id="progressbar"></div>
+      <div id="progress-text">
+	<p style="text-align:center">
+	</p>
+      </div>
     </div>
-    
+  
     <div id="top-panel" class="gray">
       <ul class="top-menu">
 	<li>
@@ -100,7 +102,7 @@
       <div class="main">
 	<h1>Select Machine Learning Algorithm</h1>
 	<div class="main-contents">
-	  <div class="build-main-container">
+	  <div class="main-container">
 	    <div class="select-group">
 	      <div class="select">
 		<div id="ml-selector" class="selector orange inner-shadow">
@@ -130,18 +132,14 @@
       <div class="main">
 	<h1>Select Evaluation Technique</h1>
 	<div class="main-contents">
-	  <div class="build-main-container">
+	  <div class="main-container">
 	    <div class="select-group">
 	      <div class="select">
 		<div id="eval-selector" class="selector orange inner-shadow">
 		  <ul>
 		  </ul>
 		</div>
-<<<<<<< HEAD
-		<div id="eval-lip" class="selector-lip" style="display: none" >
-=======
 		<div id="eval-lip" class="selector-lip" style="display: none">
->>>>>>> 00170abde6bc33bb4848387df4b0964ce552ad06
 		  <h2>Attributes</h2>
 		  <table class="attributes inner-shadow">
 		    
