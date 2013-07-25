@@ -25,7 +25,6 @@ start() ->
 
 stop() ->
     mnesia:stop().
-    
 
 put_json(Json) ->
     T = fun() ->
