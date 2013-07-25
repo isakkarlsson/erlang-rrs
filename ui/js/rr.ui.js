@@ -1,13 +1,4 @@
 $(document).ready(function() {
-    var block = function (id) {
-	$(id).block({
-	    message: "<h1>You must complete the previous step first!</h1>",
-	    css: {
-		cursor: 'default'
-	    } 
-	});
-    };
-
     block("#eval .main, #build .main");
 
     var deck = new $.scrolldeck({
@@ -38,7 +29,9 @@ $(document).ready(function() {
 				 file.name + " ("  + file.no_features + "/" + file.no_examples + ")" +
 				 "</option>");
 		}
-		$("#files .choice").chosen().change(function () {
+		$("#files .choice").chosen({
+		    width: "100%"
+		}).change(function () {
 		    var file_id = $(this).attr("value");
 		    block("#build .main, #eval .main");
 		    $("#files-confirm")
@@ -121,7 +114,8 @@ $(document).ready(function() {
 			    });
 			    var payload = {
 				evaluator: evaluator,
-				learner: learner
+				learner: learner,
+				file: dataset
 			    };
 
 			    runModel(payload);
@@ -318,4 +312,17 @@ function slider(lip) {
 
 function runModel(payload) {
     alert($.toJSON(payload));
+    block("#dataset .main, #build .main", 
+	  "<h1>Working! Please wait...</h1>");
 }
+
+function block(id, message) {
+    message = message || "<h1>You must complete the previous step first!</h1>";
+    $(id).block({
+	message: message,
+	css: {
+	    cursor: 'default'
+	} 
+    });
+};
+

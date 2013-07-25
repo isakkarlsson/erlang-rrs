@@ -7,6 +7,12 @@
 -export([websocket_info/3]).
 -export([websocket_terminate/3]).
 
+-export([
+	 spawn_model_evaluator/2,
+	 spawn_model_evaluator/4,
+	 to_json/1
+	]).
+
 %% @headerfile "rr_server.hrl"
 -include("rr_server.hrl").
 
@@ -16,7 +22,7 @@ init({tcp, http}, _Req, _Opts) ->
 websocket_init(_TransportName, Req, _Opts) ->
     process_flag(trap_exit, true),
     self() ! {progress, 0},
-    {ok, Req, #rr_state{current=0}}. %% init with some sort of state 
+    {ok, Req, #rr_state{current=undefined}}.
 
 websocket_handle({text, Json}, Req, State) ->
     Obj = (catch jsx:decode(Json)),
@@ -39,7 +45,7 @@ websocket_info(_Info, Req, State) ->
 
 websocket_terminate(_Reason, _Req, State) ->
     Process = State#rr_state.current,
-    exit(Process, normal),
+    exit(Process, terminate),
     ok.
 
 json_reply(Method, Data) ->
@@ -54,7 +60,7 @@ to_json({cv, NoFolds, Folds}) ->
 
 to_json_cv([], Acc) ->
     Acc;
-to_json_cv([{{_, Fold, _}, Measures}|Rest], Acc) ->
+to_json_cv([{{_, Fold}, Measures}|Rest], Acc) ->
     NewFold = sanitize_value(Fold),
     to_json_cv(Rest, [[{fold_no, NewFold},
 		       {measures, to_json_measures(Measures)}]|Acc]).
@@ -75,24 +81,32 @@ sanitize_value(V) ->
 
 spawn_model(Props) ->
     rr_log:info("~p ~n", [Props]),
-    spawn(fun () ->
-		  receive
-		      d ->
-			  ok
-		  end
-	  end).
+    spawn_link(?MODULE, spawn_model_evaluator, [self(), Props]).
 
+spawn_model_evaluator(Self, Props) ->
+    process_flag(trap_exit, true),
+    Csv = csv:binary_reader("../erlang-rr/data/iris.txt"),
+    {Features, Examples, ExConf} = rr_example:load(Csv, 4),
+    Pid = spawn(?MODULE, spawn_model_evaluator, [Self, Features, Examples, ExConf]),
+    receive
+	{'EXIT', _, terminate} = R ->
+	    io:format("killed!! ~p ~n", [R]),
+	    exit(Pid),
+	    csv:kill(Csv),
+	    rr_example:kill(ExConf),
+	    ok
+    end.
 
-%% spawn(fun() ->
-%% 		  Csv = csv:binary_reader("../erlang-rr/data/iris.txt"),
-%% 		  {Features, Examples, ExConf} = rr_example:load(Csv, 4),
-%% 		  {Build, Evaluate, _} = rf:new([{no_features, trunc(math:log(length(Features))/math:log(2))},
-%% 						 {progress, fun (X, Y) -> 
-%% 								    Self ! {msg, io_lib:format("~p of ~p trees done", [X, Y])}
-%% 							    end}]),
-%% 		  R = rr_eval:cross_validation(Features, Examples, ExConf,
-%% 					       [{build, Build},
-%% 						{folds, 2},
-%% 						{evaluate, rf:killer(Evaluate)}, 
-%% 						{progress, fun (Fold) -> Self ! {msg, io_lib:format("Fold ~p", [Fold])} end}]),
-%% 		  Self ! {result, to_json(R)}
+spawn_model_evaluator(Self, Features, Examples, ExConf) ->
+    rr_log:info("~p ~n", [ExConf]),
+    {Build, Evaluate, _} = rf:new([{no_features, trunc(math:log(length(Features))/math:log(2))},
+				   {progress, fun (X, Y) -> 
+						      Self ! {progress, io_lib:format("~p of ~p trees done", [X, Y])}
+					      end}]),
+    {R, _M} = rr_eval:cross_validation(Features, Examples, ExConf,
+				       [{build, Build},
+					{folds, 10},
+					{evaluate, rf:killer(Evaluate)}, 
+					{progress, fun (Fold) -> Self ! {progress, io_lib:format("Fold ~p", [Fold])} end}]),
+    rr_log:debug("~p ~n", [R]),
+    Self ! {completed, to_json(R)}.
