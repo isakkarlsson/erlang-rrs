@@ -353,7 +353,7 @@ function handleProgress(data) {
 
 function handleCompleted(data) {
     var id = data.result_id;
-    window.location.replace("/result.html?id=" + id);
+    window.location.href = "/result.html?id=" + id;
 }
 
 
