@@ -5,7 +5,7 @@
 %%% @end
 %%% Created : 24 Jul 2013 by  <Isak@ISAK-PC>
 
--module(rr_db).
+-module(result_db).
 -compile(export_all).
 
 -record(counter, {id=0, ver=1}).
@@ -26,7 +26,7 @@ start() ->
 stop() ->
     mnesia:stop().
 
-put_json(Json) ->
+insert(Json) ->
     T = fun() ->
 		Id = next_int(),
 		New = #result{id=Id, json=Json},
@@ -38,7 +38,7 @@ put_json(Json) ->
     Val.
 
    
-get_json(Id) ->
+get_value(Id) ->
     F = fun() -> mnesia:read(result, Id, read) end,
     {atomic, Val} = mnesia:transaction(F),
     case Val of

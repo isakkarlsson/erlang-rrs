@@ -17,10 +17,40 @@
     <script src="js/chosen.jquery.min.js" type="text/javascript"></script>
     <script src="js/jquery.BlockUI.js" type="text/javascript"></script>
     <script src="js/jquery.json-2.4.min.js" type="text/javascript"></script>    
+
+    <script src="js/raphael-min.js"></script>
+    <script src="js/g.raphael-min.js"></script>
+    <script src="js/g.pie-min.js"></script>
+    
     <script src="js/rr.result.ui.js"></script>
+
   </head>
 
   <body>
+
+     <div id="machine-learner-message" class="message-container">
+      <div id="dataset" class="message gray inner-shadow">
+    	<h2>Dataset</h2>
+	<p>
+	  <table class="attributes">
+	  </table>
+	</p>
+      </div>
+      <div id="learner" class="message gray inner-shadow">
+    	<h2>Machine Learner</h2>
+	<p>
+	  <table class="attributes">
+	  </table>
+	</p>
+      </div>
+      <div id="evaluation" class="message gray inner-shadow">
+    	<h2>Evaluation</h2>
+	<p>
+	  <table class="attributes">
+	  </table>
+	</p>
+      </div>
+    </div>
     <div id="top-panel" class="gray">
       <ul class="top-menu">
 	<li>
@@ -40,8 +70,8 @@
 	<h1>Basic statistics</h1>
 	<div class="main-contents">
 	  <div class="main-container">
-	    <table class="attributes">
-	    </table>
+	    <div id="basic-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
+	    <div id="brier"></div>
 	  </div>
 	</div>
       </div>
@@ -51,6 +81,10 @@
       <div class="main">
 	<h1>Area under the ROC-curve</h1>
 	<div class="main-contents">
+	  <div class="main-container">
+	    <table class="attributes">
+	    </table>
+	  </div>
 	</div>
       </div>      
     </div>

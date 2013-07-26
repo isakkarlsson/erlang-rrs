@@ -9,7 +9,7 @@
 
 -export([
 	 spawn_model_evaluator/2,
-	 spawn_model_evaluator/6,
+	 spawn_model_evaluator/7,
 	 to_json/1
 	]).
 
@@ -39,7 +39,7 @@ websocket_info({message, Msg}, Req, State) ->
 websocket_info({progress, Msg}, Req, State) ->
     {reply, {text, json_reply(progress, [{value, sanitize_value(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
-    Id = rr_db:put_json(jsx:encode(R)),
+    Id = result_db:insert(R),
     {reply, {text, json_reply(completed, [{result_id, Id}])}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
@@ -117,7 +117,7 @@ spawn_model_evaluator(Self, Props) ->
     rr_log:info("parsed props"),
     Csv = csv:binary_reader(io_lib:format("../erlang-rr/data/~s", [File])),
     {Features, Examples, ExConf} = rr_example:load(Csv, 4),
-    Pid = spawn(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Features, Examples, ExConf]),
+    Pid = spawn(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
     receive
 	{'EXIT', _, terminate} = R ->
 	    io:format("killed!! ~p ~n", [R]),
@@ -127,11 +127,10 @@ spawn_model_evaluator(Self, Props) ->
 	    ok
     end.
 
-spawn_model_evaluator(Self, E, M, Features, Examples, ExConf) ->
-    rr_log:info("spawned the evaluator ~p ~p ~n", [E, M]),
-    case E of
+spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
+    case Eval of
 	{cv, NoFolds} ->
-	    {Build, Evaluate, _} = rf:new(M ++ [{progress, 
+	    {Build, Evaluate, _} = rf:new(Machine ++ [{progress, 
 						 fun (done, done) ->
 							 Self ! {progress, 100};
 						     (X, Y) -> 
@@ -146,7 +145,7 @@ spawn_model_evaluator(Self, E, M, Features, Examples, ExConf) ->
 					    Self ! {progress, 0},
 					    Self ! {message, io_lib:format("Running fold ~p of ~p", [Fold, NoFolds])}
 				    end}]),
-	    Self ! {completed, to_json(R)};
+	    Self ! {completed, to_json(R) ++ Props};
 	_ ->
 	    ok
     end.

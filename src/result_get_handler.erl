@@ -26,9 +26,9 @@ content_types_provided(Req, State) ->
 get(Req, State) ->
     {Id, _} = cowboy_req:binding(id, Req),
     rr_log:info("~p ~n", [binary_to_integer(Id)]),
-    case rr_db:get_json(binary_to_integer(Id)) of
+    case result_db:get_value(binary_to_integer(Id)) of
 	not_found ->
 	    {"", Req, State};
 	Data ->
-	    {Data, Req, State}
+	    {jsx:encode(Data), Req, State}
     end.
