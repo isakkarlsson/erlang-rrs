@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    $.blockUI({ message: '<img style="padding-top: 10px" src="css/ajax-loader.gif" /> <p>Loading result...</p>' }); 
+
     $(".help").live({
 	mouseenter: function() {
 	    var build = $("#build-information");
@@ -38,7 +40,9 @@ $(document).ready(function() {
 	    } else {
 		handleResult(data.data);
 	    }
-	}});
+	}}).done(function() {
+	    $.unblockUI();
+	});
 
     function handleResult(data) {
 	if(data.type == "cross-validation") {
