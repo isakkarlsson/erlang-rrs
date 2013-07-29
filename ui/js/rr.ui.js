@@ -40,11 +40,13 @@ $(document).ready(function() {
 		    $("#files-confirm")
 			.switchClass("gray", "green")
 			.click(function(e) {
+			    var f = data[file_id];
+			    f.id = file_id;
 			    e.preventDefault();
 			    $("#build .main").unblock();
 			    resetMlLip();
 			    resetEvalLip();
-			    loadLearners(data[file_id]);
+			    loadLearners(f);
 			    deck.toId("#build");
 			});
 		});

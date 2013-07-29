@@ -35,12 +35,12 @@ websocket_handle_json(Obj, Req, State) ->
     {ok, Req, #rr_state{current=Process}}.
     
 websocket_info({message, Msg}, Req, State) ->
-    {reply, {text, json_reply(message, [{text, sanitize_value(Msg)}])}, Req, State};
+    {reply, {text, rr_json:reply(message, [{text, rr_json:sanitize(Msg)}])}, Req, State};
 websocket_info({progress, Msg}, Req, State) ->
-    {reply, {text, json_reply(progress, [{value, sanitize_value(Msg)}])}, Req, State};
+    {reply, {text, rr_json:reply(progress, [{value, rr_json:sanitize(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
     Id = result_db:insert(R),
-    {reply, {text, json_reply(completed, [{result_id, Id}])}, Req, State};
+    {reply, {text, rr_json:reply(completed, [{result_id, Id}])}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
@@ -49,9 +49,6 @@ websocket_terminate(_Reason, _Req, State) ->
     exit(Process, terminate),
     ok.
 
-json_reply(Method, Data) ->
-    jsx:encode([{type, sanitize_value(Method)},
-		{data, Data}]).
 
 
 to_json({cv, NoFolds, Folds}) ->
@@ -62,7 +59,7 @@ to_json({cv, NoFolds, Folds}) ->
 to_json_cv([], Acc) ->
     Acc;
 to_json_cv([{{_, Fold}, Measures}|Rest], Acc) ->
-    NewFold = sanitize_value(Fold),
+    NewFold = rr_json:sanitize(Fold),
     to_json_cv(Rest, [[{fold_no, NewFold},
 		       {measures, to_json_measures(Measures)}]|Acc]).
 
@@ -73,12 +70,6 @@ to_json_measures(Measures) ->
 			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end,  PerClass)]}|Acc]
 		end, [], Measures). 
 
-sanitize_value(V) when is_atom(V) ->
-    atom_to_binary(V, utf8);
-sanitize_value(V) when is_list(V) ->
-    iolist_to_binary(V);
-sanitize_value(V) ->
-    V.
 
 parse_file_json(Json) ->
     File = proplists:get_value(<<"file">>, Json),
@@ -114,7 +105,6 @@ spawn_model_evaluator(Self, Props) ->
     Eval = parse_evaluator_json(Props),
     Machine = parse_machine_json(Props),
 
-    rr_log:info("parsed props"),
     Csv = csv:binary_reader(io_lib:format("../erlang-rr/data/~s", [File])),
     {Features, Examples, ExConf} = rr_example:load(Csv, 4),
     Pid = spawn(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
@@ -145,7 +135,22 @@ spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
 					    Self ! {progress, 0},
 					    Self ! {message, io_lib:format("Running fold ~p of ~p", [Fold, NoFolds])}
 				    end}]),
-	    Self ! {completed, to_json(R) ++ Props};
+	    Predictions = prediction_to_json(rr_example:predictions(ExConf, Examples), Examples),
+	    Self ! {completed, to_json(R) ++ Props ++ [{predictions, Predictions}]};
 	_ ->
 	    ok
     end.
+
+prediction_to_json(Preds, Examples) ->
+    P = lists:foldl(
+	  fun ({Id, Real, Pred}, Acc) ->
+		  [[{exid, Id}, 
+		    {real, atom_to_binary(Real, utf8)},
+		    {predictions, 
+		     lists:reverse(lists:foldl(
+				     fun ({Class, Prob}, PredAcc) ->
+					     [[{class, atom_to_binary(Class, utf8)}, {probability, Prob}]|PredAcc]
+				     end, [], Pred))}]|Acc]
+	  end, [], Preds),
+    Classes = lists:map(fun ({C, _, _}) -> atom_to_binary(C, utf8) end, Examples),
+    [{classes, Classes}, {predictions, P}].

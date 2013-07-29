@@ -21,6 +21,7 @@
     <script src="js/raphael-min.js"></script>
     <script src="js/g.raphael-min.js"></script>
     <script src="js/g.pie-min.js"></script>
+    <script src="js/g.line-min.js"></script>
     
     <script src="js/rr.result.ui.js"></script>
 
@@ -54,7 +55,10 @@
     <div id="top-panel" class="gray">
       <ul class="top-menu">
 	<li>
-	  <a href="#statistics" class="nav-button">Statistics</a>
+	  <a href="#class-statistics" class="nav-button">Class statistics</a>
+	</li>
+	<li>
+	  <a href="#statistics" class="nav-button">Model statistics</a>
 	</li>
 	<li>
 	  <a href="#auc" class="nav-button">Area Under Curve</a>
@@ -64,14 +68,29 @@
 	</li>
       </ul>
     </div>
+
+    <div class="slide" id="class-statistics">
+      <div class="main">
+	<h1>Class statistics<sup class="help" help="This shows the class statistics of the
+	model. If the prior and posterior distribution is very
+	skewed, the model is likley to be bad.">?</sup></h1>
+	<div class="main-contents">
+	  <div class="main-container">
+	    <div id="class-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
+	  </div>
+	</div>
+      </div>
+    </div>
     
     <div class="slide" id="statistics">
       <div class="main">
-	<h1>Basic statistics</h1>
+	<h1>Model statistics<sup class="help" help="This shows how
+	good the model is at predicting. If the model is very skewed,
+	accuracy is unlikely a good estimator of the models
+	performance">?</sup></h1>
 	<div class="main-contents">
 	  <div class="main-container">
 	    <div id="basic-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
-	    <div id="brier"></div>
 	  </div>
 	</div>
       </div>
@@ -82,8 +101,7 @@
 	<h1>Area under the ROC-curve</h1>
 	<div class="main-contents">
 	  <div class="main-container">
-	    <table class="attributes">
-	    </table>
+	    <div id="auc-graph" style="width:1000px; margin: 20px auto; height: 700px"></div>
 	  </div>
 	</div>
       </div>      
@@ -92,6 +110,8 @@
       <div class="main">
 	<h1>Other measures</h1>
 	<div class="main-contents">
+	  <table class="attributes">
+	  </table>
 	</div>
       </div>
     </div>
