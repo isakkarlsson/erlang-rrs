@@ -49,8 +49,6 @@ websocket_terminate(_Reason, _Req, State) ->
     exit(Process, terminate),
     ok.
 
-
-
 to_json({cv, NoFolds, Folds}) ->
     [{type, <<"cross-validation">>},
      {no_folds, NoFolds},
@@ -64,10 +62,12 @@ to_json_cv([{{_, Fold}, Measures}|Rest], Acc) ->
 		       {measures, to_json_measures(Measures)}]|Acc]).
 
 to_json_measures(Measures) ->
-    lists:foldl(fun ({Key, Value}, Acc) ->
+    lists:foldl(fun ({Key, {Avg, PerClass}}, Acc) ->
+			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end, PerClass)]}|Acc];
+		    ({Key, Value}, Acc) ->
 			[{Key, Value}|Acc];
 		    ({Key, PerClass, Avg}, Acc) ->
-			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end,  PerClass)]}|Acc]
+			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end, PerClass)]}|Acc]
 		end, [], Measures). 
 
 
@@ -152,5 +152,8 @@ prediction_to_json(Preds, Examples) ->
 					     [[{class, atom_to_binary(Class, utf8)}, {probability, Prob}]|PredAcc]
 				     end, [], Pred))}]|Acc]
 	  end, [], Preds),
-    Classes = lists:map(fun ({C, _, _}) -> atom_to_binary(C, utf8) end, Examples),
+    Classes = lists:map(
+		fun ({Class, Count, _}) -> 
+			[{class, atom_to_binary(Class, utf8)}, {count, Count}]
+		end, Examples),
     [{classes, Classes}, {predictions, P}].

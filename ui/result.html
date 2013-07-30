@@ -22,12 +22,28 @@
     <script src="js/g.raphael-min.js"></script>
     <script src="js/g.pie-min.js"></script>
     <script src="js/g.line-min.js"></script>
-    
+    <script src="js/g.bar-min.js"></script>
+
+    <script src="js/rr.js"></script>    
+    <script src="js/rr.ui.js"></script>    
+    <script src="js/rr.graphs.auc.js"></script>    
+    <script src="js/rr.graphs.value.js"></script>
     <script src="js/rr.result.ui.js"></script>
 
   </head>
 
   <body>
+    <div id="loading-error" style="display:none; text-aling: left">
+      <h1>Error</h1>
+      <p style="text-align: left; padding: 10px">We were unfortunately unable to process your request. This can be due to numerous reasons. For example:
+	<ul style="text-align: left">
+	  <li>You entered an incorrect result ID.</li>
+	  <li>There are no generated models (generate a new model <a href="index.html">here</a>).</li>
+	</ul>
+	If you have a result ID enter it here: <input type="text" size="2" />
+	<input id="loading-error-btn" type="submit" value="Load result ID" />
+      </p>
+    </div>
 
      <div id="machine-learner-message" class="message-container">
       <div id="dataset" class="message gray inner-shadow">
@@ -58,10 +74,13 @@
 	  <a href="#class-statistics" class="nav-button">Class statistics</a>
 	</li>
 	<li>
+	  <a href="#auc" class="nav-button">Area Under Curve</a>
+	</li>
+	<li>
 	  <a href="#statistics" class="nav-button">Model statistics</a>
 	</li>
 	<li>
-	  <a href="#auc" class="nav-button">Area Under Curve</a>
+	  <a href="#hitchart" class="nav-button">Hit Rate</a>
 	</li>
 	<li>
 	  <a href="#other" class="nav-button">Other Evaluations</a>
@@ -81,21 +100,7 @@
 	</div>
       </div>
     </div>
-    
-    <div class="slide" id="statistics">
-      <div class="main">
-	<h1>Model statistics<sup class="help" help="This shows how
-	good the model is at predicting. If the model is very skewed,
-	accuracy is unlikely a good estimator of the models
-	performance">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container">
-	    <div id="basic-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
-	  </div>
-	</div>
-      </div>
-    </div>
-	
+
     <div class="slide" id="auc">
       <div class="main">
 	<h1>Area under the ROC-curve</h1>
@@ -106,12 +111,39 @@
 	</div>
       </div>      
     </div>
+    
+    <div class="slide" id="statistics">
+      <div class="main">
+	<h1>Model statistics<sup class="help" help="This shows how
+	good the model is at predicting. If the model is very skewed,
+	accuracy is unlikely a good estimator of the models
+	performance">?</sup></h1>
+	<div class="main-contents">
+	  <div class="main-container" style="display: inline-block; overflow: hidden;">
+	    <table class="attributes inner-shadow" style="float:left; width: 20%; margin:20px 80px; padding:5px">
+	    </table>
+	    <div id="basic-graphs" style="width: 600px; margin: 20px 0; height: 700px; display:inline"></div>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+    <div class="slide" id="hitchart">
+      <div class="main">
+	<h1>HitChart<sup class="help" help="Visualizes the hit rate of the classifier">?</sup></h1>
+	<div class="main-contents">
+	  <div class="main-container">
+	    <div id="hit-graph" style="width:1000px; margin: 20px auto; height: 700px"></div>
+	  </div>
+	</div>
+      </div>      
+    </div>
+
     <div class="slide" id="other">
       <div class="main">
 	<h1>Other measures</h1>
 	<div class="main-contents">
-	  <table class="attributes">
-	  </table>
+
 	</div>
       </div>
     </div>
