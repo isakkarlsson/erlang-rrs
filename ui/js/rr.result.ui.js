@@ -119,10 +119,10 @@ $(document).ready(function() {
 	res = [], labels = [];
 	for(c in predictions.classes) {
 	    var pre = tmp[predictions.classes[c].class];
-	    if(pre != undefined && pre > 1) {
+//	    if(pre != undefined && pre > 1) {
 		labels.push(predictions.classes[c].class);
 		res.push(tmp[predictions.classes[c].class]);
-	    }	    
+//	    }	    
 	}
 	return { data: res, labels: labels };
     }

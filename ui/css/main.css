@@ -37,16 +37,13 @@ body {
 }
 
 .top-menu {
-    display: block;
-    list-style-type: none;
     text-align: center;
-    margin:0 auto;
-    width: 80%;
+    margin: 0 auto;
     padding: 0;
 }
 
 .top-menu li {
-    float: left;
+    display: inline-block;
 }
 
 .nav-button {

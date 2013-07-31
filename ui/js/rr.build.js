@@ -319,7 +319,7 @@ function runModel(payload) {
 	min: 0,
 	max: 100
     });
-    block("#eval .main", $("#progress"));
+    $.blockUI({message: $("#progress")});
     rr.client("ws://127.0.0.1:8080/api/rf", {
 	message: function(data) {
 	    $("#progress-text p").html(data.text);
@@ -332,6 +332,7 @@ function runModel(payload) {
 	},
 	error: function(data) {
 	    console.log(data);
+	    $.blockUI({message: "<h1>Model evaluation failed</h1><p>Please <a href='index.html'>restart</a></p>"});
 	},
 	close_on_complete: true,
 	payload: $.toJSON(payload)

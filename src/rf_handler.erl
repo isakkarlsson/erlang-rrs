@@ -36,6 +36,8 @@ websocket_handle_json(Obj, Req, State) ->
     
 websocket_info({message, Msg}, Req, State) ->
     {reply, {text, rr_json:reply(message, [{text, rr_json:sanitize(Msg)}])}, Req, State};
+websocket_info({error, Msg}, Req, State) ->
+    {reply, {text, rr_json:reply(error, [{text, rr_json:sanitize(Msg)}])}, Req, State};
 websocket_info({progress, Msg}, Req, State) ->
     {reply, {text, rr_json:reply(progress, [{value, rr_json:sanitize(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
@@ -95,7 +97,7 @@ parse_machine_json(Json) ->
     end.
 
 spawn_model(Props) ->
-    rr_log:info("~p ~n", [Props]),
+    rr_log:info("spawning model evaluator"),
     spawn_link(?MODULE, spawn_model_evaluator, [self(), Props]).
 
 spawn_model_evaluator(Self, Props) ->
@@ -107,7 +109,7 @@ spawn_model_evaluator(Self, Props) ->
 
     Csv = csv:binary_reader(io_lib:format("../erlang-rr/data/~s", [File])),
     {Features, Examples, ExConf} = rr_example:load(Csv, 4),
-    Pid = spawn(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
+    Pid = spawn_link(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
     receive
 	{'EXIT', _, terminate} = R ->
 	    io:format("killed!! ~p ~n", [R]),
@@ -118,28 +120,35 @@ spawn_model_evaluator(Self, Props) ->
     end.
 
 spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
-    case Eval of
-	{cv, NoFolds} ->
-	    {Build, Evaluate, _} = rf:new(Machine ++ [{progress, 
-						 fun (done, done) ->
-							 Self ! {progress, 100};
-						     (X, Y) -> 
-							 Self ! {progress, round((X/Y)*100)}
-						 end}]),
-	    {R, _M} = rr_eval:cross_validation(
-			Features, Examples, ExConf,
-			[{build, Build},
-			 {folds, NoFolds},
-			 {evaluate, rf:killer(Evaluate)}, 
-			 {progress, fun (Fold) -> 
-					    Self ! {progress, 0},
-					    Self ! {message, io_lib:format("Running fold ~p of ~p", [Fold, NoFolds])}
-				    end}]),
-	    Predictions = prediction_to_json(rr_example:predictions(ExConf, Examples), Examples),
-	    Self ! {completed, to_json(R) ++ Props ++ [{predictions, Predictions}]};
-	_ ->
-	    ok
-    end.
+    rr_log:info("spawned model evaluator at ~p", [self()]),
+%    try
+	case Eval of
+	    {cv, NoFolds} ->
+		{Build, Evaluate, _} = rf:new(Machine ++ [{progress, 
+							   fun (done, done) ->
+								   Self ! {progress, 100};
+							       (X, Y) -> 
+								   Self ! {progress, round((X/Y)*100)}
+							   end}]),
+		{R, _M} = rr_eval:cross_validation(
+			    Features, Examples, ExConf,
+			    [{build, Build},
+			     {folds, NoFolds},
+			     {evaluate, rf:killer(Evaluate)}, 
+			     {progress, fun (Fold) -> 
+						Self ! {progress, 0},
+						Self ! {message, io_lib:format("Running fold ~p of ~p", [Fold, NoFolds])}
+					end}]),
+		Predictions = prediction_to_json(rr_example:predictions(ExConf, Examples), Examples),
+		Self ! {completed, to_json(R) ++ Props ++ [{predictions, Predictions}]};
+	    _ ->
+		ok
+	end.
+    %% catch
+    %% 	X:Y ->
+    %% 	    rr_log:info("~p ~p", [X, Y]),
+    %% 	    Self ! {error, "build-fail"}
+    %% end.
 
 prediction_to_json(Preds, Examples) ->
     P = lists:foldl(
