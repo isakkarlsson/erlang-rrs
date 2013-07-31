@@ -185,14 +185,18 @@ $(document).ready(function() {
 		    "  <td class='attr-value'>";
 
 		if(value.type == "numeric") {
-		    item += "<div key='" + option + "' class='slider' min='" + 
-			value.min + "' max='" + 
-			props.current.valueHandler.handleMax(value) + "' default='" + 
-			props.current.valueHandler.handleDefault(value) + "' step='" + 
-			props.current.valueHandler.handleStep(value) + "'></div>";
-		    item += "<td class='attr-progress'><span id='" + option + "-current'>" + 
-			props.current.valueHandler.handleDefault(value) + "</span></td>";
-		    item += "</td>";
+		    if(value.max) {
+			item += "<div key='" + option + "' class='slider' min='" + 
+			    value.min + "' max='" + 
+			    props.current.valueHandler.handleMax(value) + "' default='" + 
+			    props.current.valueHandler.handleDefault(value) + "' step='" + 
+			    props.current.valueHandler.handleStep(value) + "'></div>";
+			item += "<td class='attr-progress'><span id='" + option + "-current'>" + 
+			    props.current.valueHandler.handleDefault(value) + "</span></td>";
+			item += "</td>";
+		    } else {
+			alert("spinner");
+		    }
 		} else if (value.type == "categoric") {
 		    item += "<select key='" + option + "'class='choice'>";
 		    for(op in value.options) {
@@ -273,6 +277,9 @@ function ValueHandler (dataset) {
 }
 
 
+function initSpinner(parent) {
+
+}
 
 function initChosen(parent) {
     $(parent + " .choice").each(function() {

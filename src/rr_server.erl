@@ -8,8 +8,7 @@ main(_Args) ->
     ok = application:start(ranch),
     ok = application:start(cowboy),
     ok = rr_db:start(),
-    Props = rr:read_config("rr_server.config"),
-    rr_config:init(Props),
+    rr_config:init("rr_server.config", []),
     rr_log:new(std_err, debug),
     Dispatch = cowboy_router:compile(
 		 [ 
