@@ -46,6 +46,9 @@ $(document).ready(function() {
 			    deck.toId("#build");
 			});
 		});
+	    },
+	    error: function (data) {
+		serverError("#dataset .main");
 	    }
 	});
     }
@@ -85,7 +88,11 @@ $(document).ready(function() {
 			}
 		    }
 		});
-	    }});
+	    },
+	    error: function(data) {
+		serverError("#ml .main");
+	    } 
+	});
     };
 
     loadEvaluators = function(learner, dataset) {
@@ -127,7 +134,11 @@ $(document).ready(function() {
 			}
 		    }
 		});
-	    }});
+	    }
+	    error: function(data) {
+		serverError("#eval .main");
+	    }
+	});
 	
     };
   
