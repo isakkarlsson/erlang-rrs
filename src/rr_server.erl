@@ -13,7 +13,7 @@ main(_Args) ->
     Dispatch = cowboy_router:compile(
 		 [ 
 		   {'_', [
-			  {"/api/rf", rf_handler, []},
+			  {"/api/experiment", experiment_handler, []},
 			  {"/api/dataset/files", files_get_all_handler, []},
 			  {"/api/evaluator/get-all", eval_get_all_handler, []},
 			  {"/api/machine-learning/get-all", ml_get_all_handler, []},

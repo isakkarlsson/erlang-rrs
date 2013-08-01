@@ -1,4 +1,4 @@
--module(rf_handler).
+-module(experiment_handler).
 -behaviour(cowboy_websocket_handler).
 
 -export([init/3]).
@@ -20,34 +20,43 @@ init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_TransportName, Req, _Opts) ->
-    self() ! {message, "Initialized. Waiting for go!"},
     self() ! {progress, 0},
-    {ok, Req, #rr_state{current=undefined}}.
+    {ok, Req, #rrs_experiment{current=undefined}}.
 
 websocket_handle({text, Json}, Req, State) ->
-    Data = (catch jsx:decode(Json)),
+    Data = rrs_json:safe_decode(Json),
     websocket_handle_json(Data, Req, State);
 websocket_handle(_Data, Req, State) ->
     {ok, Req, State}.
 
+%% @doc handle experiment messages
+websocket_handle_json(error, Req, State) ->
+    {shutdown, Req, State};
 websocket_handle_json(Obj, Req, State) ->
-    Process = spawn_model(Obj),
-    {ok, Req, #rr_state{current=Process}}.
+    Current = State#rrs_experiment.current,
+    if Current == undefined -> %% note: only one experiment per client
+	    Process = spawn_model(Obj),
+	    {ok, Req, #rrs_experiment{current=Process}};
+       true ->
+	    {reply, {text, rrs_json:error("invalid-experiment")}, Req, State}
+    end.
     
+%% @doc send messages to the client
 websocket_info({message, Msg}, Req, State) ->
-    {reply, {text, rr_json:reply(message, [{text, rr_json:sanitize(Msg)}])}, Req, State};
+    {reply, {text, rrs_json:reply(message, [{text, rrs_json:sanitize(Msg)}])}, Req, State};
 websocket_info({error, Msg}, Req, State) ->
-    {reply, {text, rr_json:reply(error, [{text, rr_json:sanitize(Msg)}])}, Req, State};
+    {reply, {text, rrs_json:reply(error, [{text, rrs_json:sanitize(Msg)}])}, Req, State};
 websocket_info({progress, Msg}, Req, State) ->
-    {reply, {text, rr_json:reply(progress, [{value, rr_json:sanitize(Msg)}])}, Req, State};
+    {reply, {text, rrs_json:reply(progress, [{value, rrs_json:sanitize(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
     Id = result_db:insert(R),
-    {reply, {text, rr_json:reply(completed, [{result_id, Id}])}, Req, State};
+    {reply, {text, rrs_json:reply(completed, [{result_id, Id}])}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
+%% @doc terminate any running experiments when the client disconnects
 websocket_terminate(_Reason, _Req, State) ->
-    Process = State#rr_state.current,
+    Process = State#rrs_experiment.current,
     exit(Process, terminate),
     ok.
 
@@ -59,7 +68,7 @@ to_json({cv, NoFolds, Folds}) ->
 to_json_cv([], Acc) ->
     Acc;
 to_json_cv([{{_, Fold}, Measures}|Rest], Acc) ->
-    NewFold = rr_json:sanitize(Fold),
+    NewFold = rrs_json:sanitize(Fold),
     to_json_cv(Rest, [[{fold_no, NewFold},
 		       {measures, to_json_measures(Measures)}]|Acc]).
 
@@ -71,7 +80,6 @@ to_json_measures(Measures) ->
 		    ({Key, PerClass, Avg}, Acc) ->
 			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end, PerClass)]}|Acc]
 		end, [], Measures). 
-
 
 parse_file_json(Json) ->
     File = proplists:get_value(<<"file">>, Json),
@@ -90,8 +98,8 @@ parse_machine_json(Json) ->
     Machine = proplists:get_value(<<"learner">>, Json),
     case proplists:get_value(<<"id">>, Machine) of
 	<<"rf">> ->
-	    [{no_features, proplists:get_value(<<"no-features">>, Machine)},
-	     {no_trees, proplists:get_value(<<"no-trees">>, Machine)}];
+	    [{no_features, proplists:get_value(<<"no_features">>, Machine)},
+	     {no_trees, proplists:get_value(<<"no_trees">>, Machine)}];
 	_ ->
 	    []
     end.
@@ -120,8 +128,7 @@ spawn_model_evaluator(Self, Props) ->
     end.
 
 spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
-    rr_log:info("spawned model evaluator at ~p", [self()]),
-%    try
+    try
 	case Eval of
 	    {cv, NoFolds} ->
 		{Build, Evaluate, _} = rf:new(Machine ++ [{progress, 
@@ -143,12 +150,13 @@ spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
 		Self ! {completed, to_json(R) ++ Props ++ [{predictions, Predictions}]};
 	    _ ->
 		ok
-	end.
-    %% catch
-    %% 	X:Y ->
-    %% 	    rr_log:info("~p ~p", [X, Y]),
-    %% 	    Self ! {error, "build-fail"}
-    %% end.
+	end
+    catch
+	X:Y ->
+	    rr_log:debug("build failed with reason: ~p", [{X, Y}]),
+	    erlang:display(erlang:get_stacktrace()),
+	    Self ! {error, "build-fail"}
+    end.
 
 prediction_to_json(Preds, Examples) ->
     P = lists:foldl(
