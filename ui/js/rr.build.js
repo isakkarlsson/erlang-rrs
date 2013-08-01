@@ -90,7 +90,7 @@ $(document).ready(function() {
 		});
 	    },
 	    error: function(data) {
-		serverError("#ml .main");
+		serverError("#build .main");
 	    } 
 	});
     };
@@ -134,7 +134,7 @@ $(document).ready(function() {
 			}
 		    }
 		});
-	    }
+	    },
 	    error: function(data) {
 		serverError("#eval .main");
 	    }
@@ -367,4 +367,8 @@ function block(id, message) {
 	} 
     });
 };
+
+function serverError(id) {
+    block(id, "<h1>Server Error!</h1><p>Could not retrive the intended information</p>");
+}
 
