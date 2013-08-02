@@ -60,7 +60,7 @@ $(document).ready(function() {
 	handleInfo(data.file, {id: "#dataset"});
 	handleInfo(data.learner, {id: "#learner"});
 	handleInfo(data.evaluator, {id: "#evaluation"});		
-	auc(data.predictions);
+	auc(data.predictions, data.folds[0].measures.auc);
 
 	classStatistics(data.predictions, data.folds[0]);
     }
@@ -127,11 +127,12 @@ $(document).ready(function() {
 	return { data: res, labels: labels };
     }
 
-    function auc(predictions) {
+    function auc(predictions, avg) {
 	var r = Raphael("auc-graph");
 	var auc = r.auc(r.width / 2, 10, r.width*0.6, r.width*0.4, predictions, {
 	    baseline: true,
-	    "stroke-widht": 2
+	    "stroke-widht": 2,
+	    legends: avg
 	});
 	auc.lines.hover(function() {
 	    this.label[0].stop();

@@ -16,9 +16,9 @@
 	    var x = p.predictions.sort(function(a, b) {
 		var fa = find_prob(a.predictions, p.classes[c].class);
 		var fb = find_prob(b.predictions, p.classes[c].class);
-		return fb - fa;
+		return fa - fb;
 	    });
-	    
+	    console.log(p.classes[c], p.predictions);
 	    var tp = [], fp = [];
 	    var t = 0.0, f = 0.0;
 	    for(n in p.predictions) {
@@ -48,6 +48,7 @@
 	opts.baseline_color = opts.baseline_color || "#000";
 	opts.baseline_dasharray = opts.baseline_dasharray || "-";
 	opts["stroke-width"] = opts["stroke-widht"] || 3;
+	opts.legends = opts.legends || predictions.classes.map(function(x) { return x.class});
 
 	var inst = this;
 	var chart = paper.set(),
@@ -66,12 +67,23 @@
 	chart.auc = line;
 	chart.lines = line.lines;
 
-	var labels = predictions.classes.map(function(x) { return x.class; });
+	
+	var labels = [];
+	if($.isArray(opts.legends)) {
+	    labels = opts.legends;
+	} else {
+	    for(key in opts.legends) {
+		if(key != "average") {
+		    labels.push(key + " (" + opts.legends[key].toFixed(5) + ")");
+		}
+	    }
+	}
+	
 	if(opts.baseline) {
 	    labels.push(opts.baseline_legend);
 	}
 	chart.labels = paper.set();
- 	var nx = x - width/4; var h = y+height+25;
+ 	var nx = x - width/2+10; var h = y+height+25;
  	for( var i = 0; i < labels.length; ++i ) {
  	    var clr = chart.lines[i].attr("stroke");
  	    chart.labels.push(paper.set());

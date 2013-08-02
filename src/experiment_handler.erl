@@ -9,8 +9,7 @@
 
 -export([
 	 spawn_model_evaluator/2,
-	 spawn_model_evaluator/7,
-	 to_json/1
+	 spawn_model_evaluator/7
 	]).
 
 %% @headerfile "rr_server.hrl"
@@ -60,26 +59,7 @@ websocket_terminate(_Reason, _Req, State) ->
     exit(Process, terminate),
     ok.
 
-to_json({cv, NoFolds, Folds}) ->
-    [{type, <<"cross-validation">>},
-     {no_folds, NoFolds},
-     {folds, to_json_cv(Folds, [])}].
 
-to_json_cv([], Acc) ->
-    Acc;
-to_json_cv([{{_, Fold}, Measures}|Rest], Acc) ->
-    NewFold = rrs_json:sanitize(Fold),
-    to_json_cv(Rest, [[{fold_no, NewFold},
-		       {measures, to_json_measures(Measures)}]|Acc]).
-
-to_json_measures(Measures) ->
-    lists:foldl(fun ({Key, {Avg, PerClass}}, Acc) ->
-			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end, PerClass)]}|Acc];
-		    ({Key, Value}, Acc) ->
-			[{Key, Value}|Acc];
-		    ({Key, PerClass, Avg}, Acc) ->
-			[{Key, [{average, Avg}|lists:map(fun ({K,_, V}) -> {K, V} end, PerClass)]}|Acc]
-		end, [], Measures). 
 
 parse_file_json(Json) ->
     File = proplists:get_value(<<"file">>, Json),
@@ -98,14 +78,17 @@ parse_machine_json(Json) ->
     Machine = proplists:get_value(<<"learner">>, Json),
     case proplists:get_value(<<"id">>, Machine) of
 	<<"rf">> ->
-	    [{no_features, proplists:get_value(<<"no_features">>, Machine)},
-	     {no_trees, proplists:get_value(<<"no_trees">>, Machine)}];
+	    Prior = [{no_features, proplists:get_value(<<"no_features">>, Machine)}],
+	    Args = rf:args(Machine, Prior),
+	    rr_log:info("~p", [Args]),
+	    Args;
 	_ ->
 	    []
     end.
 
 spawn_model(Props) ->
-    rr_log:info("spawning model evaluator"),
+    rr_log:info("spawning experiment evaluator"),
+    rr_log:debug(" with properties ~p", [Props]),
     spawn_link(?MODULE, spawn_model_evaluator, [self(), Props]).
 
 spawn_model_evaluator(Self, Props) ->
@@ -146,8 +129,8 @@ spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
 						Self ! {progress, 0},
 						Self ! {message, io_lib:format("Running fold ~p of ~p", [Fold, NoFolds])}
 					end}]),
-		Predictions = prediction_to_json(rr_example:predictions(ExConf, Examples), Examples),
-		Self ! {completed, to_json(R) ++ Props ++ [{predictions, Predictions}]};
+		Predictions = rrs_json:convert_predictions(rr_example:predictions(ExConf, Examples), Examples),
+		Self ! {completed, rrs_json:convert_cv(R) ++ Props ++ [{predictions, Predictions}]};
 	    _ ->
 		ok
 	end
@@ -158,19 +141,4 @@ spawn_model_evaluator(Self, Eval, Machine, Props, Features, Examples, ExConf) ->
 	    Self ! {error, "build-fail"}
     end.
 
-prediction_to_json(Preds, Examples) ->
-    P = lists:foldl(
-	  fun ({Id, Real, Pred}, Acc) ->
-		  [[{exid, Id}, 
-		    {real, atom_to_binary(Real, utf8)},
-		    {predictions, 
-		     lists:reverse(lists:foldl(
-				     fun ({Class, Prob}, PredAcc) ->
-					     [[{class, atom_to_binary(Class, utf8)}, {probability, Prob}]|PredAcc]
-				     end, [], Pred))}]|Acc]
-	  end, [], Preds),
-    Classes = lists:map(
-		fun ({Class, Count, _}) -> 
-			[{class, atom_to_binary(Class, utf8)}, {count, Count}]
-		end, Examples),
-    [{classes, Classes}, {predictions, P}].
+

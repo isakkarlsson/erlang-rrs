@@ -1,3 +1,10 @@
+%%% @author Isak Karlsson <isak-kar@dsv.su.se>
+%%% @copyright (C) 2013, Isak Karlsson
+%%% @doc
+%%%
+%%% @end
+%%% Created :  2 Aug 2013 by Isak Karlsson <isak-kar@dsv.su.se>
+
 -module(rrs_json).
 
 -export([
@@ -5,8 +12,10 @@
 	 error/1,
 
 	 safe_decode/1,
-
-	 sanitize/1
+	 sanitize/1,
+	 
+	 convert_cv/1,
+	 convert_predictions/2
 	]).
 
 reply(Method, Data) ->
@@ -22,6 +31,47 @@ safe_decode(Json) ->
 	_:_ ->
 	    error
     end.
+
+%% @doc convert predictions to json
+convert_predictions(Preds, Examples) ->
+    P = lists:foldl(
+	  fun ({Id, Real, Pred}, Acc) ->
+		  [[{exid, Id}, 
+		    {real, atom_to_binary(Real, utf8)},
+		    {predictions, 
+		     lists:reverse(lists:foldl(
+				     fun ({Class, Prob}, PredAcc) ->
+					     [[{class, atom_to_binary(Class, utf8)}, {probability, Prob}]|PredAcc]
+				     end, [], Pred))}]|Acc]
+	  end, [], Preds),
+    Classes = lists:map(
+		fun ({Class, Count, _}) -> 
+			[{class, atom_to_binary(Class, utf8)}, {count, Count}]
+		end, Examples),
+    [{classes, Classes}, {predictions, P}].
+
+%% @doc convert a cross-validation to json
+convert_cv({cv, NoFolds, Folds}) ->
+    [{type, <<"cross-validation">>},
+     {no_folds, NoFolds},
+     {folds, convert_cv_folds(Folds, [])}].
+
+convert_cv_folds([], Acc) ->
+    Acc;
+convert_cv_folds([{{_, Fold}, Measures}|Rest], Acc) ->
+    NewFold = rrs_json:sanitize(Fold),
+    convert_cv_folds(Rest, [[{fold_no, NewFold},
+			     {measures,convert_cv_measures(Measures)}]|Acc]).
+
+convert_cv_measures(Measures) ->
+    lists:foldl(fun ({Key, {PerClass, Avg}}, Acc) ->
+			[{Key, [{average, Avg}|lists:map(fun ({K, {_, V}}) -> {K, V} end, PerClass)]}|Acc];
+		    ({Key, Value}, Acc) ->
+			[{Key, Value}|Acc];
+		    ({Key, PerClass, Avg}, Acc) ->
+			[{Key, [{average, Avg}|lists:map(fun ({K, {_, V}}) -> {K, V} end, PerClass)]}|Acc]
+		end, [], Measures). 
+
 
 %% @doc return an error reply
 error(Data) ->
