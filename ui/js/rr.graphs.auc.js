@@ -16,14 +16,14 @@
 	    var x = p.predictions.sort(function(a, b) {
 		var fa = find_prob(a.predictions, p.classes[c].class);
 		var fb = find_prob(b.predictions, p.classes[c].class);
-		return fa - fb;
+		return fb - fa;
 	    });
 	    console.log(p.classes[c], p.predictions);
 	    var tp = [], fp = [];
 	    var t = 0.0, f = 0.0;
 	    for(n in p.predictions) {
 		(function (real, predicted, current) {
-		    if(real == predicted && real == current) {
+		    if(real == current) { // note: fix
 			t += 1;
 		    } else if (real != current) {
 			f += 1;
