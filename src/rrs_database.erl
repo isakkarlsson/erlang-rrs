@@ -1,11 +1,11 @@
-%%% @author  <Isak@ISAK-PC>
+%%% @author Isak Karlsson <isak-kar@dsv.su.se>
 %%% @copyright (C) 2013, 
 %%% @doc
 %%%
 %%% @end
-%%% Created : 24 Jul 2013 by  <Isak@ISAK-PC>
+%%% Created : 24 Jul 2013 by Isak Kalsson <isak-kar@dsv.su.se>
 
--module(result_db).
+-module(rrs_database).
 -compile(export_all).
 
 -record(counter, {id=0, ver=1}).

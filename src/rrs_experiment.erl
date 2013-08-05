@@ -1,11 +1,13 @@
--module(experiment_handler).
+-module(rrs_experiment).
 -behaviour(cowboy_websocket_handler).
 
--export([init/3]).
--export([websocket_init/3]).
--export([websocket_handle/3]).
--export([websocket_info/3]).
--export([websocket_terminate/3]).
+-export([
+	 init/3,
+	 websocket_init/3,
+	 websocket_handle/3,
+	 websocket_info/3,
+	 websocket_terminate/3
+	]).
 
 -export([
 	 spawn_model_evaluator/2,
@@ -13,7 +15,7 @@
 	]).
 
 %% @headerfile "rr_server.hrl"
--include("rr_server.hrl").
+-include("rrs.hrl").
 
 init({tcp, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -97,8 +99,8 @@ spawn_model_evaluator(Self, Props) ->
     File = parse_file_json(Props),
     Eval = parse_evaluator_json(Props),
     Machine = parse_machine_json(Props),
-
-    Csv = csv:binary_reader(io_lib:format("../erlang-rr/data/~s", [File])),
+    %% try / catch
+    Csv = csv:binary_reader(io_lib:format("../data/~s", [File])),
     {Features, Examples, ExConf} = rr_example:load(Csv, 4),
     Pid = spawn_link(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
     receive

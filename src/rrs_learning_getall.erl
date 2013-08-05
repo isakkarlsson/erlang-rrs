@@ -1,22 +1,19 @@
-%%% @author  <Isak@ISAK-PC>
+%%% @author Isak Karlsson <isak-kar@dsv.su.se>
 %%% @copyright (C) 2013, 
 %%% @doc
 %%%
 %%% @end
-%%% Created : 23 Jul 2013 by  <Isak@ISAK-PC>
+%%% Created : 23 Jul 2013 by Isak Karlsson <isak-kar@dsv.su.se>
+-module(rrs_learning_getall).
 
--module(ml_get_all_handler).
-
-
--export([init/3]).
--export([content_types_provided/2]).
--export([get_all/2]).
+-export([
+	 init/3,
+	 content_types_provided/2,
+	 get_all/2
+	]).
 
 init(_Transport, _Req, []) ->
 	{upgrade, protocol, cowboy_rest}.
-
-allowed_methods(Req, State) ->
-    {['GET'], Req, State}.
 
 content_types_provided(Req, State) ->
     {[

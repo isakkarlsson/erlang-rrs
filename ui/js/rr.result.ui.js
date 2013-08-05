@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $.blockUI({ message: '<img style="padding-top: 10px" src="css/ajax-loader.gif" /> <p>Loading result...</p>' }); 
     $("#loading-error-btn").button().click(function() {
-	window.location.href = "/result.html?id=" + $("#loading-error input[type=text]").val();
+	window.ion.href = "/result.html?id=" + $("#loading-error input[type=text]").val();
     });
     $("#loading-error input[type=text]").keypress(function(event) {
 	if ( event.which == 13 ) {
@@ -185,7 +185,7 @@ $(document).ready(function() {
 	animatePointValue(p.center);
 
 	for(key in avg) {
-	    $("#statistics .attributes").append(
+	    $("#other .attributes").append(
 		"<tr>" +
 		"  <td class='attr-key'>" + key+ "</td>" +
 		"  <td class='attr-value'>" + avg[key] + "</td>" + 		
