@@ -25,7 +25,7 @@ get(Req, State) ->
     if Id == <<"null">> ->
 	    {rr_json:error("not_found"), Req, State};
        true ->
-	    case result_db:get_value(binary_to_integer(Id)) of
+	    case result_db:get_value(list_to_integer(binary_to_list(Id))) of
 		not_found ->
 		    {rr_json:error("not_found"), Req, State};
 		Data ->
