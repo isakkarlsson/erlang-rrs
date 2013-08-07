@@ -338,7 +338,7 @@ function runModel(payload) {
 	max: 100
     });
     $.blockUI({message: $("#progress")});
-    rr.client("ws://127.0.0.1:8080/api/experiment", {
+    rr.client("ws://" + window.location.host +"/api/experiment", {
 	message: function(data) {
 	    $("#progress-text p").html(data.text);
 	},
