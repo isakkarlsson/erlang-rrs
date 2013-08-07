@@ -23,12 +23,12 @@ content_types_provided(Req, State) ->
 get(Req, State) ->
     {Id, _} = cowboy_req:binding(id, Req),
     if Id == <<"null">> ->
-	    {rr_json:error("not_found"), Req, State};
+	    {rrs_json:error("not_found"), Req, State};
        true ->
-	    case result_db:get_value(list_to_integer(binary_to_list(Id))) of
+	    case rrs_database:get_value(list_to_integer(binary_to_list(Id))) of
 		not_found ->
-		    {rr_json:error("not_found"), Req, State};
+		    {rrs_json:error("not_found"), Req, State};
 		Data ->
-		    {rr_json:reply(result, Data), Req, State}
+		    {rrs_json:reply(result, Data), Req, State}
 	    end
     end.

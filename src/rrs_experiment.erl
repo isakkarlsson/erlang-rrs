@@ -50,7 +50,7 @@ websocket_info({error, Msg}, Req, State) ->
 websocket_info({progress, Msg}, Req, State) ->
     {reply, {text, rrs_json:reply(progress, [{value, rrs_json:sanitize(Msg)}])}, Req, State};
 websocket_info({completed, R}, Req, State) ->
-    Id = result_db:insert(R),
+    Id = rrs_database:insert(R),
     {reply, {text, rrs_json:reply(completed, [{result_id, Id}])}, Req, State};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
