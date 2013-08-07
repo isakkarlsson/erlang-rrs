@@ -103,7 +103,12 @@
 
     <div class="slide" id="auc">
       <div class="main">
-	<h1>Area under the ROC-curve</h1>
+	<h1>Area under the ROC-curve<sup class="help"
+					 help="The AUC curves are calculated from the predicted probabilities for the
+					       entire data set when doing cross-validation. Therefore, the area is calculated as the
+					       average of each fold. Thus, the number show and the curve will not necessarily 
+					       correspond entirely (especially if the number of examples of a certain class is smaller
+					       than the number of folds).">?</sup></h1>
 	<div class="main-contents">
 	  <div class="main-container">
 	    <div id="auc-graph" style="width:1000px; margin: 20px auto; height: 700px"></div>

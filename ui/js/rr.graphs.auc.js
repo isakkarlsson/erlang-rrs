@@ -18,19 +18,20 @@
 		var fb = find_prob(b.predictions, p.classes[c].class);
 		return fb - fa;
 	    });
-	    console.log(p.classes[c], p.predictions);
 	    var tp = [], fp = [];
 	    var t = 0.0, f = 0.0;
-	    for(n in p.predictions) {
-		(function (real, predicted, current) {
-		    if(real == current) { // note: fix
-			t += 1;
-		    } else if (real != current) {
-			f += 1;
-		    }
+	    console.log(p.classes[c], p.predictions.slice(0))
+	    for(n in x) {
+		(function (real, current) {
 		    tp.push(t/ctotal);
 		    fp.push(f/(total-ctotal));
-		}(p.predictions[n].real, p.predictions[n].predictions[0].class, p.classes[c].class));
+		    if(real == current) {
+			console.log(n, real, current, t, f);
+			t += 1;
+		    } else {
+			f += 1;
+		    }
+		}(p.predictions[n].real, p.classes[c].class));
 	    }
 	    result.tp.push(tp);
 	    result.fp.push(fp);
@@ -43,12 +44,13 @@
      *
      */
     function AUC(paper, x, y, width, height, predictions, opts) {
+	var classes = predictions.classes.map(function(x) { return x.class });
+	console.log(predictions.classes);
 	opts.baseline = opts.baseline || false;
 	opts.baseline_legend = opts.baseline_legend || "Baseline";
 	opts.baseline_color = opts.baseline_color || "#000";
 	opts.baseline_dasharray = opts.baseline_dasharray || "-";
 	opts["stroke-width"] = opts["stroke-widht"] || 3;
-	opts.legends = opts.legends || predictions.classes.map(function(x) { return x.class});
 
 	var inst = this;
 	var chart = paper.set(),
@@ -69,14 +71,11 @@
 
 	
 	var labels = [];
-	if($.isArray(opts.legends)) {
-	    labels = opts.legends;
-	} else {
-	    for(key in opts.legends) {
-		if(key != "average") {
-		    labels.push(key + " (" + opts.legends[key].toFixed(5) + ")");
-		}
-	    }
+	for(key in classes) {
+	    var value = opts.legend_values[classes[key]];
+	    console.log(classes[key], value);
+	    if(value)
+		labels.push(classes[key] + " (" + value.toFixed(5) + ")");
 	}
 	
 	if(opts.baseline) {

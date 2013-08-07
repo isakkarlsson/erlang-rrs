@@ -132,7 +132,7 @@ $(document).ready(function() {
 	var auc = r.auc(r.width / 2, 10, r.width*0.6, r.width*0.4, predictions, {
 	    baseline: true,
 	    "stroke-widht": 2,
-	    legends: avg
+	    legend_values: avg
 	});
 	auc.lines.hover(function() {
 	    this.label[0].stop();
