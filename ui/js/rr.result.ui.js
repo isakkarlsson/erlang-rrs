@@ -68,6 +68,7 @@ $(document).ready(function() {
     function classStatistics(predictions, avg) {
 	var r = Raphael("class-graphs");
 	res = countPredictedClasses(predictions)
+	console.log(res.labels);
 	drawClassDistribution(r, {
 	    title: "Posterior Class Distribution",
 	    x: r.width/2 + 300,
@@ -78,11 +79,12 @@ $(document).ready(function() {
 	    data: res.data
 	});
 
+	console.log(res.labels);
 	drawClassDistribution(r, {
 	    title: "Prior Class Distribution",
 	    x: r.width/2 - 300,
 	    y: 150,
-	    legends: predictions.classes.map(function(e) { return e.class + " (%%.%%)"; }),
+	    legends: res.labels.map(function(e) { return e + " (%%.%%)"}),
 	    legendpos: "south",
 	    animate: animatePie,
 	    data: predictions.classes.map(function(e) { return e.count; }) //res.slice(0)
@@ -197,7 +199,8 @@ $(document).ready(function() {
 	r.text(opts.x, opts.y-130, opts.title).attr({font: "20px Helvetica"});
 	var pie = r.piechart(opts.x, opts.y, 100, opts.data, {
 	    legend: opts.legends,
-	    legendpos: opts.legendpos
+	    legendpos: opts.legendpos,
+	    sort: false
 	});
 	opts.animate(pie);
 			     
@@ -283,7 +286,8 @@ $(document).ready(function() {
             this.flag.animate({opacity: 0}, 300, function () {this.remove();});
         };
 	var bar = r.barchart(opts.x, opts.y, opts.width, opts.height, [precision, recall], {
-	    stacked: false
+	    stacked: false,
+	    max: 1
 	});
 	labels = opts.labels || classes;
         bar.labels = r.set();

@@ -61,8 +61,6 @@ websocket_terminate(_Reason, _Req, State) ->
     exit(Process, terminate),
     ok.
 
-
-
 parse_file_json(Json) ->
     File = proplists:get_value(<<"file">>, Json),
     proplists:get_value(<<"file">>, File).
@@ -90,7 +88,6 @@ parse_machine_json(Json) ->
 
 spawn_model(Props) ->
     rr_log:info("spawning experiment evaluator"),
-    rr_log:debug(" with properties ~p", [Props]),
     spawn_link(?MODULE, spawn_model_evaluator, [self(), Props]).
 
 spawn_model_evaluator(Self, Props) ->
@@ -100,12 +97,12 @@ spawn_model_evaluator(Self, Props) ->
     Eval = parse_evaluator_json(Props),
     Machine = parse_machine_json(Props),
     %% try / catch
-    Csv = csv:binary_reader(io_lib:format("../data/~s", [File])),
+    Csv = csv:binary_reader(filename:join(rr_config:get_value('dataset.folder', "../data"), File)),
     {Features, Examples, ExConf} = rr_example:load(Csv, 4),
     Pid = spawn_link(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, Features, Examples, ExConf]),
     receive
 	{'EXIT', _, terminate} = R ->
-	    io:format("killed!! ~p ~n", [R]),
+	    rr_log:debug("terminating model ~p", [Pid]),
 	    exit(Pid),
 	    csv:kill(Csv),
 	    rr_example:kill(ExConf),
