@@ -20,13 +20,11 @@
 	    });
 	    var tp = [], fp = [];
 	    var t = 0.0, f = 0.0;
-	    console.log(p.classes[c], p.predictions.slice(0))
 	    for(n in x) {
 		(function (real, current) {
 		    tp.push(t/ctotal);
 		    fp.push(f/(total-ctotal));
 		    if(real == current) {
-			console.log(n, real, current, t, f);
 			t += 1;
 		    } else {
 			f += 1;
@@ -45,7 +43,6 @@
      */
     function AUC(paper, x, y, width, height, predictions, opts) {
 	var classes = predictions.classes.map(function(x) { return x.class });
-	console.log(predictions.classes);
 	opts.baseline = opts.baseline || false;
 	opts.baseline_legend = opts.baseline_legend || "Baseline";
 	opts.baseline_color = opts.baseline_color || "#000";
@@ -73,7 +70,6 @@
 	var labels = [];
 	for(key in classes) {
 	    var value = opts.legend_values[classes[key]];
-	    console.log(classes[key], value);
 	    if(value)
 		labels.push(classes[key] + " (" + value.toFixed(5) + ")");
 	}

@@ -68,7 +68,6 @@ $(document).ready(function() {
     function classStatistics(predictions, avg) {
 	var r = Raphael("class-graphs");
 	res = countPredictedClasses(predictions)
-	console.log(res.labels);
 	drawClassDistribution(r, {
 	    title: "Posterior Class Distribution",
 	    x: r.width/2 + 300,
@@ -79,7 +78,6 @@ $(document).ready(function() {
 	    data: res.data
 	});
 
-	console.log(res.labels);
 	drawClassDistribution(r, {
 	    title: "Prior Class Distribution",
 	    x: r.width/2 - 300,
