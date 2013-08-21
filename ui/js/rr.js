@@ -18,7 +18,7 @@ rr = (function () {
 		} else if(data.type == "completed") {
 		    complete(data.data);
 		    if(close_on_complete)
-			socket.close();
+			that.socket.close();
 		} else if(data.type == "message") {
 		    message(data.data);
 		} else if(data.type == "error") {

@@ -1,7 +1,7 @@
 $(document).ready(function() {
     $.blockUI({ message: '<img style="padding-top: 10px" src="css/ajax-loader.gif" /> <p>Loading result...</p>' }); 
     $("#loading-error-btn").button().click(function() {
-	window.ion.href = "/result.html?id=" + $("#loading-error input[type=text]").val();
+	window.location.href = "/result.html?id=" + $("#loading-error input[type=text]").val();
     });
     $("#loading-error input[type=text]").keypress(function(event) {
 	if ( event.which == 13 ) {
@@ -45,6 +45,7 @@ $(document).ready(function() {
 	    if(data.type == "error") {
 		$.blockUI({message: $("#loading-error")});
 	    } else {
+		handleModel(data.data);
 		handleResult(data.data);
 		$.unblockUI();
 	    }},
@@ -52,6 +53,95 @@ $(document).ready(function() {
 	    $.blockUI({message: $("#loading-error")});
 	}
     });
+
+    function handleModel(data) {
+	if(data.model.available) {
+	    $("#model-tools").show();
+	    $("#use-model").click(function() {
+		$("#use-model-dialog").dialog({
+		    modal: true,
+		    autoResize:true,
+		    width: 500,
+		    position: {
+			my: "center top",
+			at: "center bottom",
+			of: $("#top-panel")
+		    },
+		    open: function (event, ui) {
+			loadFeatures(this, data);
+		    }
+		});		   
+	    });
+	    $("#download-model").attr("href", "/api/model/get/" + $.getUrl("id")).attr("download", data.file.name + "_model.rr");
+	}
+    }
+
+    function loadFeatures(that, data) {
+	var table = $("#use-model-dialog .attributes").html("");
+	for(f in data.features) {
+	    (function(feature) {
+		table.append("<tr>" +
+			     "<td class='attr-key'>" + feature.name + "</td>" + 
+			     "<td class='attr-type'>" + feature.type + "</td>" + 
+			     "<td class='attr-value'><input type='text' /></td>" +
+			     "</tr>");
+	    })(data.features[f])
+	}
+	$("#evaluate").click(function() {
+	    rr.client("ws://" + window.location.host + "/api/evaluator", {
+		message: function (data) {
+		    console.log(data);
+		},
+		complete: function(data) {
+		    $("#prediction-content").hide("blind").show("blind");
+		    $("#prediction-result").html("");
+		    var r = Raphael("prediction-result");
+		    drawClassDistribution(r, {
+			title: "Prediction Result",
+			x: r.width/2,
+			y: 150,
+			legends: data.probabilities.map(function(e){ return e.class + "%%.%%" }),
+			legendpos: "south",
+			animate: animatePie,
+			data: data.probabilities.map(function(e) { return e.prop })
+		    });
+		    $("#predicted")
+			.html("")
+			.append("<p>The most probable class is: <strong>" + data.prediction.class + "</strong></p>");
+		},
+		close_on_complete: true,
+		payload: $.toJSON({
+		    id: parseInt($.getUrl("id")),
+		    example: collect_evaluation("#use-model-dialog")
+		})
+	    });
+	});
+    }
+
+    function collect_evaluation(s) {
+	var types = $.makeArray($(s + " .attr-type").map(function(){ console.log(this); return $(this).text(); }));
+	types.push("Class");
+	var names = $.makeArray($(s + " .attr-key").map(function(){ console.log(this); return $(this).text(); }));
+	names.push("Class");
+	var values = $.makeArray($(s + " .attr-value").map(function(){ 
+	    var tmp = $(this).children().first().val();
+	    if(tmp) {
+		return tmp;
+	    } else {
+		alert("your are missing a value");
+		throw "error!!";
+	    }
+	}));
+	values.push("unkown");
+	var combined = types.join() + "\r\n" + names.join() + "\r\n" + values.join() + "\r\n";
+	console.log(combined);
+	return combined;
+
+/* "numeric, numeric, numeric, numeric, class\r\n"+
+	    "Spetal Length, Sepal Widht, Petal Length, Petal Width, Class\r\n" +
+	    "1.1,2.5,4.2,3.1,?\r\n";*/
+	
+    }
 
     function handleResult(data) {
 	if(data.type == "cross-validation") {

@@ -43,10 +43,12 @@ main(Args) ->
     end,
 
     rr_config:init(proplists:get_value(<<"config">>, Options, "rrs.config"), []), 
-    rr_log:new(rr_config:get_value('log.target', std_err), rr_config:get_value('log.level', debug)),
+    rr_log:new(rr_config:get_value('log.target', std_err), 
+	       rr_config:get_value('log.level', debug)),
     case proplists:get_value(<<"generate-dataconfig">>, Options) of
 	[] -> ok;
 	Folder ->
+	    rr_log:info("generate configuration for file in ~s", [Folder]),
 	    generate_dataconfig(Folder),
 	    halt()
     end,
@@ -64,10 +66,12 @@ main(Args) ->
 		 [ 
 		   {'_', [
 			  {"/api/experiment", rrs_experiment, []},
+			  {"/api/evaluator", rrs_evaluator, []},
 			  {"/api/dataset/files", rrs_dataset_getall, []},
 			  {"/api/evaluator/get-all", rrs_validation_getall, []},
 			  {"/api/machine-learning/get-all", rrs_learning_getall, []},
 			  {"/api/result/get/:id", rrs_result_get, []},
+			  {"/api/model/get/:id", rrs_model_get, []},
 			  
 			  {"/[...]", cowboy_static, 
 			   [

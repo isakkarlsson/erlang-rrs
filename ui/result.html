@@ -44,8 +44,36 @@
 	<input id="loading-error-btn" type="submit" value="Load result ID" />
       </p>
     </div>
-
-     <div id="machine-learner-message" class="message-container">
+    <div id="use-model-dialog" style="display:none; text-align: left"
+	 title="Use Model to Classify Custom Example">
+      <div class="selector-lip">
+	<h2>Attributes<sup class="help" help="Insert the values for this example">?</sup></h2>
+	<table class="attributes inner-shadow">
+	  
+	</table>
+	<div class="selector-lip-foot">
+	  <a href="#" id="evaluate" class="selector-button confirm green inner-shadow help" key="evaluate"
+	     help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
+	    Evaluate
+	  </a>
+	</div>
+	<div id="prediction-content" style="display:none">
+	  <div id="prediction-result" style="widht:500px">
+	    
+	  </div>
+	  <div id="predicted" class="inner-shadow green" style="text-align: center">
+	  </div>
+	</div>
+      </div>
+    </div>
+    
+    <div id="machine-learner-message" class="message-container">
+      <div id="model-tools" style="padding: 10px" style="display:none">
+	<a href="#" id="use-model" class="selector-button orange inner-shadow">Use Model</a>
+		
+	<a href="#" id="download-model" class="selector-button green inner-shadow">Download Model</a>
+      </div>
+      
       <div id="dataset" class="message gray inner-shadow">
     	<h2>Dataset</h2>
 	<p>

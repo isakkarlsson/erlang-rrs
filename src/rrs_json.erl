@@ -15,7 +15,8 @@
 	 sanitize/1,
 	 
 	 convert_cv/1,
-	 convert_predictions/2
+	 convert_predictions/2,
+	 convert_features/1	 
 	]).
 
 reply(Method, Data) ->
@@ -45,10 +46,16 @@ convert_predictions(Preds, Examples) ->
 				     end, [], Pred))}]|Acc]
 	  end, [], Preds),
     Classes = lists:map(
-		fun ({Class, Count, _}) -> 
+		fun ({Class, Count}) -> 
 			[{class, atom_to_binary(Class, utf8)}, {count, Count}]
 		end, Examples),
     [{classes, Classes}, {predictions, P}].
+
+convert_features(Features) ->
+    lists:map(fun ({Type, Name}) ->
+		      [{type, sanitize(Type)},
+		       {name, sanitize(Name)}]
+	      end, Features).
 
 %% @doc convert a cross-validation to json
 convert_cv({cv, NoFolds, Folds}) ->

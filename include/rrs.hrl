@@ -7,6 +7,16 @@
 
 %% @doc 
 -record(rrs_experiment, {
-	  current = 0 :: number()
+	  current :: pid()
 	 }).
 
+%% @doc record containing data for an experiemtn
+-record(rrs_experiment_data, {
+	  model = undefined :: binary(),
+	  properties,
+	  evaluation,
+	  predictions,
+	  classes,
+	  features
+	 }).
+	  

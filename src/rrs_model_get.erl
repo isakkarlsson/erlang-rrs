@@ -4,7 +4,7 @@
 %%%
 %%% @end
 %%% Created : 23 Jul 2013 by Isak Karlsson <isak-kar@dsv.su.se>
--module(rrs_result_get).
+-module(rrs_model_get).
 
 -export([
 	 init/3,
@@ -20,7 +20,7 @@ init(_Transport, _Req, []) ->
 
 content_types_provided(Req, State) ->
     {[
-      {<<"application/json">>, get}
+      {<<"application/octet-binary">>, get}
      ], Req, State}.
 
 get(Req, State) ->
@@ -30,24 +30,9 @@ get(Req, State) ->
        true ->
 	    case rrs_database:get_value(list_to_integer(binary_to_list(Id))) of
 		not_found ->
-		    {rrs_json:error("not_found"), Req, State};
+		    {halt, Req, State};
 		Data ->
-		    JsonData = process_data(Data),
-		    {rrs_json:reply(result, JsonData), Req, State}
+		    Model = Data#rrs_experiment_data.model,
+		    {Model, Req, State}
 	    end
     end.
-
-process_data(Data) ->
-    #rrs_experiment_data {
-       model = Model,
-       properties = Props,
-       evaluation = Evaluation,
-       predictions = Predictions,
-       classes = Classes,
-       features = Features
-      } = Data,
-    rrs_json:convert_cv(Evaluation) ++
-	Props ++
-	[{predictions, rrs_json:convert_predictions(Predictions, Classes)}] ++
-	[{features, rrs_json:convert_features(Features)}] ++
-	[{model, [{available, Model =/= undefined}]}].
