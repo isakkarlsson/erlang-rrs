@@ -97,7 +97,7 @@ $(document).ready(function() {
 		    $("#prediction-result").html("");
 		    var r = Raphael("prediction-result");
 		    drawClassDistribution(r, {
-			title: "Prediction Result",
+			title: "Prediction probabilities",
 			x: r.width/2,
 			y: 150,
 			legends: data.probabilities.map(function(e){ return e.class + " %%.%%" }),
