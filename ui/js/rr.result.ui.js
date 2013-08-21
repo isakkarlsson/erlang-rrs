@@ -100,10 +100,10 @@ $(document).ready(function() {
 			title: "Prediction Result",
 			x: r.width/2,
 			y: 150,
-			legends: data.probabilities.map(function(e){ return e.class + "%%.%%" }),
+			legends: data.probabilities.map(function(e){ return e.class + " %%.%%" }),
 			legendpos: "south",
 			animate: animatePie,
-			data: data.probabilities.map(function(e) { return e.prop })
+			data: data.probabilities.map(function(e) { return e.prob })
 		    });
 		    $("#predicted")
 			.html("")
