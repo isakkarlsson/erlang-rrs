@@ -23,13 +23,13 @@
 	for(var g = 1; g <= 10; g++) {
 	    var grade = paper.circle(width/2, heigth/2, ((width/2)/10)*g-10);
 	    var text = paper.text(width+20, ((heigth/2)/10)*g-10, (10-g)*10+10 + "%");
-	    var l = paper.path(["M", width/2, ((heigth/2)/10)*g-10, "L", width+10, ((heigth/2)/10)*g-10]);
-	    gradeline.push(l);
+/*	    var l = paper.path(["M", width/2, ((heigth/2)/10)*g-10, "L", width+10, ((heigth/2)/10)*g-10]);
+	    gradeline.push(l);*/
 	    gradetext.push(text);
 
 	    text = paper.text(width+20, heigth-((heigth/2)/10)*g+10, (10-g)*10+10 + "%");
-	    l = paper.path(["M", width/2, heigth-((heigth/2)/10)*g+10, "L", width+10, heigth-((heigth/2)/10)*g+10]);
-	    gradeline.push(l);
+/*	    l = paper.path(["M", width/2, heigth-((heigth/2)/10)*g+10, "L", width+10, heigth-((heigth/2)/10)*g+10]);
+	    gradeline.push(l);*/
 	    gradetext.push(text);
 
 	    gradeset.push(grade);
@@ -62,7 +62,9 @@
 	    var points = paper.set();
 	    lineset.push(points);
 
-	    var label = paper.text(width + 80, 40+17*i, classes[i].class);
+	    var label = paper.text(width + 63, 40+17*i, classes[i].class).attr({
+		"text-anchor": "start"
+	    });
 	    var small = paper.circle(width + 55, 40+17*i, 6).attr({
 		fill: colors[i],
 		stroke: colors[i]
@@ -72,7 +74,7 @@
 	    for(p in predictions.predictions) {
 		(function(pred) {
 		    if(classid[pred.real] == i) {
-			var cross = paper.circle(width/2+scatter(opts.scatter), 13+(heigth/2)*(1-pred.predictions[0].probability), 3)
+			var cross = paper.circle(width/2+scatter(opts.scatter), 10+(heigth/2)*(1-pred.predictions[0].probability), 3)
 			    .attr({
 				stroke: colors[classid[pred.predictions[0].class]]
 			    });
