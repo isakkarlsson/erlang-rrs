@@ -153,6 +153,12 @@ $(document).ready(function() {
 	auc(data.predictions, data.folds[0].measures.auc);
 
 	classStatistics(data.predictions, data.folds[0]);
+	hitchart(data.predictions);
+    }
+
+    function hitchart(pred) {
+	var r = Raphael("hit-graph");
+	r.hitchart(r.width/2, r.width/2, 400, 400, pred, {});
     }
 
     function classStatistics(predictions, avg) {

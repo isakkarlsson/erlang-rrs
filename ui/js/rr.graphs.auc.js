@@ -42,6 +42,7 @@
      *
      */
     function AUC(paper, x, y, width, height, predictions, opts) {
+	console.log(predictions);
 	var classes = predictions.classes.map(function(x) { return x.class });
 	opts.baseline = opts.baseline || false;
 	opts.baseline_legend = opts.baseline_legend || "Baseline";
