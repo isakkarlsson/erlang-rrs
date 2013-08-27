@@ -8,7 +8,6 @@
 	opts.scatter = opts.scatter || 20;
 	var chart = paper.set();
 	var classes = predictions.classes;
-	console.log(predictions.predictions);
 	var axis = paper.set();
 	chart.push(axis);
 	var classid = {};
@@ -30,7 +29,6 @@
 
 	    text = paper.text(width+20, heigth-((heigth/2)/10)*g+10, (10-g)*10+10 + "%");
 	    l = paper.path(["M", width/2, heigth-((heigth/2)/10)*g+10, "L", width+10, heigth-((heigth/2)/10)*g+10]);
-	    console.log(g*10);
 	    gradeline.push(l);
 	    gradetext.push(text);
 
@@ -74,7 +72,6 @@
 	    for(p in predictions.predictions) {
 		(function(pred) {
 		    if(classid[pred.real] == i) {
-			console.log(classid, pred.real);
 			var cross = paper.circle(width/2+scatter(opts.scatter), 13+(heigth/2)*(1-pred.predictions[0].probability), 3)
 			    .attr({
 				stroke: colors[classid[pred.predictions[0].class]]
