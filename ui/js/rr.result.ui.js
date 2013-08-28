@@ -18,6 +18,7 @@ $(document).ready(function() {
 	$("#machine-learner-message").hide("slide");
     });
 
+   
     $(".help").live({
 	mouseenter: function() {
 	    var build = $("#build-information");
@@ -163,13 +164,26 @@ $(document).ready(function() {
 	auc(data.predictions, data.folds[0].measures.auc);
 
 	classStatistics(data.predictions, data.folds[0]);
-	hitchart(data.predictions);
+
+	console.log(Math.round(360*(1/data.predictions.classes.length))-6);
+	$("#scatter-slide").slider({
+	    range: "min",
+	    value: 20,
+	    max: Math.round(360*(1/data.predictions.classes.length))-6,
+	    min: 1,
+	    step: 1,
+	    slide: function(event, ui) {
+		hitchart(data.predictions, ui.value);
+	    }	
+	});
+	hitchart(data.predictions, 20);
     }
 
-    function hitchart(pred) {
+    function hitchart(pred, scatter) {
+	$("#hit-graph").html("");
 	var r = Raphael("hit-graph");
 	r.hitchart(r.width/2, r.width/2, 400, 400, pred, {
-	    scatter: 10,
+	    scatter: scatter,
 	    decrease_scatter: true,
 	    labels_per_row: 5
 	});
@@ -293,12 +307,24 @@ $(document).ready(function() {
 	    legend: "Strenght"
 	});
 	animatePointValue(p.center);
+	var out = function(avg) {
+	    if(typeof avg == "number") {
+		return avg.toFixed(5);
+	    }
 
+	    var str = "";
+	    for(key in avg) {
+		str += "<strong>" + key + "</strong>: " + avg[key].toFixed(5) + "<br />";
+	    }
+	    return str;
+	    
+	}
+	
 	for(key in avg) {
 	    $("#other .attributes").append(
 		"<tr>" +
 		"  <td class='attr-key'>" + key+ "</td>" +
-		"  <td class='attr-value'>" + avg[key] + "</td>" + 		
+		"  <td class='attr-value'>" + out(avg[key]) + "</td>" + 		
 		"</tr>");
 	}
     }

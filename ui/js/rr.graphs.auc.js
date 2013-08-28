@@ -48,6 +48,7 @@
 	opts.baseline_color = opts.baseline_color || "#000";
 	opts.baseline_dasharray = opts.baseline_dasharray || "-";
 	opts["stroke-width"] = opts["stroke-widht"] || 3;
+	opts.labels_per_row = opts.labels_per_row || 5;
 
 	var inst = this;
 	var chart = paper.set(),
@@ -78,13 +79,23 @@
 	    labels.push(opts.baseline_legend);
 	}
 	chart.labels = paper.set();
- 	var nx = x - width/2+10; var h = y+height+25;
+ 	var nx = x - width/2+10; var h = y+height+25; var widest = 0;
  	for( var i = 0; i < labels.length; ++i ) {
  	    var clr = chart.lines[i].attr("stroke");
  	    chart.labels.push(paper.set());
  	    chart.labels[i].push(paper["circle"](nx + 5, h, 5).attr({fill: clr, stroke: "none"}));
  	    chart.labels[i].push(txt = paper.text(nx + 20, h, labels[i]).attr({fill: "#000", "text-anchor": "start"}));
- 	    nx += chart.labels[i].getBBox().width * 1.3;
+	    h += 17;
+	    if(chart.labels[i].getBBox().width + 30 > widest) {
+		widest = chart.labels[i].getBBox().width + 30;
+	    }
+	    if(h >= y+height+25+17*opts.labels_per_row) {
+		h = y+height+25;
+		nx += widest;
+		widest = 0;
+	    }
+
+// 	    nx +=  * 1.3;
  	};
 	
 	for(var n=0; n < labels.length; n++) {
