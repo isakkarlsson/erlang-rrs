@@ -26,26 +26,34 @@
 	var gradetext = paper.set();
 	var gradeline = paper.set();
 
+	chart.gradeset = gradeset;
+	chart.gradetext = gradetext;
+
 	console.log("hej", Math.abs(angle_step - opts.scatter), angle_step, opts.scatter);
 	if(angle_step - opts.scatter < 5 && opts.decrease_scatter) {
 	    opts.scatter /= classes.length;
 	}
 
 	for(var g = 1; g <= 10; g++) {
+	    var t = paper.set();
 	    var grade = paper.circle(x, heigth/2, ((width/2)/10)*g-10);
-	    var text = paper.text(x+width/2+20, ((heigth/2)/10)*g-10, (10-g)*10+10 + "%");
-	    gradetext.push(text);
+	    var text = paper.text(x+width/2+20, ((heigth/2)/10)*(10-g)+10, g*10 + "%");
+	    t.push(text);
 
-	    text = paper.text(x+width/2+20, heigth-((heigth/2)/10)*g+10, (10-g)*10+10 + "%");
-	    gradetext.push(text);
-
+	    text = paper.text(x+width/2+20, heigth-((heigth/2)/10)*(10-g)-10, g*10 + "%");
+	    t.push(text);
+	    grade.text = t;
+	    console.log((g)*10);
+	    gradetext.push(t);
 	    gradeset.push(grade);
 	}
+	console.log(gradetext);
 	chart.push(gradeset);
 	gradeset.attr({
 	    "stroke-dasharray": "-",
 	    "stroke-width": 1,
 	    stroke: "#efefef",
+	    fill: "#fff"
 	}).toBack();
 	gradetext.attr({
 	    fill: "#333",

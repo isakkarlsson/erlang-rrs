@@ -182,11 +182,18 @@ $(document).ready(function() {
     function hitchart(pred, scatter) {
 	$("#hit-graph").html("");
 	var r = Raphael("hit-graph");
-	r.hitchart(r.width/2, r.width/2, 400, 400, pred, {
+	var hit = r.hitchart(r.width/2, r.width/2, 400, 400, pred, {
 	    scatter: scatter,
 	    decrease_scatter: true,
 	    labels_per_row: 5
 	});
+	for(var i = 0; i < hit.gradeset.length; i++) {
+	    hit.gradeset[i].hover(function() {
+		this.text.attr({"font-size": "14px"});
+	    }, function() {
+		this.text.attr({"font-size": "8px"});
+	    });
+	}
     }
 
     function classStatistics(predictions, avg) {
