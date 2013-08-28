@@ -36,10 +36,13 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#585858', endColorstr='#464646',GradientType=0 ); /* IE6-9 */
 }
 
+
+
 .top-menu {
     text-align: center;
     margin: 0 auto;
     padding: 0;
+    overflow:hidden;
 }
 
 .top-menu li {
@@ -51,7 +54,7 @@ body {
     height: 37px;
     display: block;
     text-shadow: rgb(0, 0, 0) 0px 1px 2px;
-    width: 200px;
+    width: 180px;
     text-decoration: none;
     color: #eee;
     font-size: 14px;
@@ -72,7 +75,7 @@ a.nav-button:hover {
     margin: 0 auto;
     padding-top: 20px;
     padding-bottom: 20px;
-    width: 70%;
+    width: 100%;
 }
 
 .main-contents {
@@ -335,18 +338,50 @@ a.method:hover {
     border: 1px solid rgba(0, 0, 0, 0.25);
 }
 
+.hide-show-btn {
+    position: absolute;
+    top: 95px;
+    left: -55px; 
+    z-index: 10;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+}
+
+.transparent-background {
+
+}
+
+a.boxclose{
+    float:right;
+    margin-top:-12px;
+    margin-right:-12px;
+    cursor:pointer;
+    color: #333;
+    border: 1px solid #AEAEAE;
+    border-radius: 30px;
+    -moz-border-radius: 4px;
+    background: #efefef;
+    font-size: 10px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 0px;
+    padding: 11px 3px;
+    width: 20px;
+    text-align: center;
+}
+
+
 
 .message-container {
     z-index: 10;
-    position: fixed;
-    top: 100px;
-    top: 10rem;
-    left: 20px;
-    width: 13%;
+    position: absolute;
+    top: 60px;
+    left: -9px;
+    width: 200px;
     font-size: 12px;
-    max-height: 70%;
-    overflow-y: auto;
-    overflow-x: hidden;
+    padding: 5px;
+    padding-bottom: 0px;
+    background: rgba(0,0,0, 0.1)
 }
 
 .message h2 {
@@ -359,7 +394,6 @@ a.method:hover {
     padding-left: 10px;
     padding-bottom: 2px;
     padding-top: 0px;
-//    border-bottom: 1px solid rgba(255,255,255, 0.3);
 }
 
 .message {

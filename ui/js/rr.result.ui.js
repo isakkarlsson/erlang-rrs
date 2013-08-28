@@ -8,6 +8,16 @@ $(document).ready(function() {
 	    $("#loading-error-btn").click();
 	}
     });
+    $("#machine-learner-message").hide();
+    $("#hide-show-left").click(function() {
+	$("#machine-learner-message").show("slide");	
+	$(this).hide();
+    });
+    $("#boxclose").click(function() {
+	$("#hide-show-left").delay(600).show("fade");
+	$("#machine-learner-message").hide("slide");
+    });
+
     $(".help").live({
 	mouseenter: function() {
 	    var build = $("#build-information");
@@ -158,7 +168,11 @@ $(document).ready(function() {
 
     function hitchart(pred) {
 	var r = Raphael("hit-graph");
-	r.hitchart(r.width/2, r.width/2, 400, 400, pred, {});
+	r.hitchart(r.width/2, r.width/2, 400, 400, pred, {
+	    scatter: 10,
+	    decrease_scatter: true,
+	    labels_per_row: 5
+	});
     }
 
     function classStatistics(predictions, avg) {
@@ -305,6 +319,7 @@ $(document).ready(function() {
 	r.text(opts.x, opts.y-130, opts.title).attr({font: "20px Helvetica"});
 	var pie = r.piechart(opts.x, opts.y, 100, [a, 1-a],
 			     {
+				 sort: false,
 				 legend: opts.legends,
 				 legendpos: opts.legendpos,
 				 colors: ["#5ca941", "#df3e3e"]
