@@ -58,6 +58,8 @@ $(document).ready(function() {
 	    } else {
 		handleModel(data.data);
 		handleResult(data.data);
+		console.log(data);
+		$("title").text("rrs - result for '" + data.data.file.name + "'");
 		$.unblockUI();
 	    }},
 	error: function() {
@@ -164,8 +166,6 @@ $(document).ready(function() {
 	auc(data.predictions, data.folds[0].measures.auc);
 
 	classStatistics(data.predictions, data.folds[0]);
-
-	console.log(Math.round(360*(1/data.predictions.classes.length))-6);
 	$("#scatter-slide").slider({
 	    range: "min",
 	    value: 20,
@@ -173,25 +173,45 @@ $(document).ready(function() {
 	    min: 1,
 	    step: 1,
 	    slide: function(event, ui) {
-		hitchart(data.predictions, ui.value);
+		hitchart(data.predictions, ui.value, $("#only-predictions").prop("checked"));
 	    }	
 	});
-	hitchart(data.predictions, 20);
+	$("#only-predictions").click(function (e) {
+	    hitchart(data.predictions, $("#scatter-slide").slider("value"), $(this).prop("checked"));
+	});
+	hitchart(data.predictions, $("#scatter-slide").slider("value"), $("#only-predictions").prop("checked"));
     }
 
-    function hitchart(pred, scatter) {
+    function hitchart(pred, scatter, only_best) {
+	console.log("only best", only_best);
 	$("#hit-graph").html("");
 	var r = Raphael("hit-graph");
 	var hit = r.hitchart(r.width/2, r.width/2, 400, 400, pred, {
 	    scatter: scatter,
 	    decrease_scatter: true,
-	    labels_per_row: 5
+	    labels_per_row: 5,
+	    only_best: only_best
 	});
 	for(var i = 0; i < hit.gradeset.length; i++) {
 	    hit.gradeset[i].hover(function() {
 		this.text.attr({"font-size": "14px"});
 	    }, function() {
 		this.text.attr({"font-size": "8px"});
+	    });
+	}
+	for(var i = 0; i < hit.axis.length; i++) {
+	    hit.axis[i].box.hover(function() {
+		this.points.animate({r: 4, "fill-opacity": 0.5}, 100);
+	    }, function() {
+		this.points.animate({r: 3, "fill-opacity": 0.0}, 100);
+	    });
+	}
+	for(var i = 0; i < hit.axis.length; i++) {
+	    hit.axis[i].line.top.hover(function() {
+		console.log(this);
+		this.box.points.animate({r: 4, "fill-opacity": 0.5}, 100);
+	    }, function() {
+		this.box.points.animate({r: 3, "fill-opacity": 0.0}, 100);
 	    });
 	}
     }

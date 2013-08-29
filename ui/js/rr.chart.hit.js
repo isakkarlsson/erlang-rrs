@@ -9,6 +9,7 @@
 	opts.colors = opts.colors || this.colors;
 	opts.decrease_scatter = opts.decrease_scatter || false;
 	opts.labels_per_row = opts.labels_per_row || 7;
+	opts.only_best = opts.only_best == undefined ? true : opts.only_best;
 
 	var chart = paper.set();
 	var classes = predictions.classes;
@@ -29,7 +30,6 @@
 	chart.gradeset = gradeset;
 	chart.gradetext = gradetext;
 
-	console.log("hej", Math.abs(angle_step - opts.scatter), angle_step, opts.scatter);
 	if(angle_step - opts.scatter < 5 && opts.decrease_scatter) {
 	    opts.scatter /= classes.length;
 	}
@@ -43,11 +43,9 @@
 	    text = paper.text(x+width/2+20, heigth-((heigth/2)/10)*(10-g)-10, g*10 + "%");
 	    t.push(text);
 	    grade.text = t;
-	    console.log((g)*10);
 	    gradetext.push(t);
 	    gradeset.push(grade);
 	}
-	console.log(gradetext);
 	chart.push(gradeset);
 	gradeset.attr({
 	    "stroke-dasharray": "-",
@@ -69,16 +67,28 @@
 	var text_y = heigth+20,
 	    text_x = x-width/2,
 	    widest = 0;
+	chart.axis = paper.set();
 	for(var i=0; i < classes.length; i++){
 	    var lineset = paper.set();
+	    chart.axis.push(lineset);
 	    var line = paper.path(["M", x, 1, "L", x, width/2]);
-
+	    var box = paper.rect(x-opts.scatter, 10, opts.scatter*2, heigth/2-10).attr({
+		fill: "#000",
+		"fill-opacity": 0.02,
+		stroke: "#000",
+		"stroke-opacity": 0.04
+	    });
+	    lineset.line = line;
+	    lineset.box = box;
+	    lineset.push(box);
 	    line.attr({"stroke-width": 2, "stroke": "#333"});
 	    lineset.push(line);
 	    circle = paper.circle(x, 5, 4).attr({stroke: "black" , fill: colors[i] || "black"});
 	    lineset.push(circle);
-	    var points = paper.set();
-	    lineset.push(points);
+	    line.top = circle;
+	    line.top.box = box;
+	    box.points = paper.set();
+	    lineset.push(box.points);
 
 	    var label = paper.text(text_x, text_y, classes[i].class).attr({
 		"text-anchor": "start"
@@ -103,11 +113,21 @@
 	    for(p in predictions.predictions) {
 		(function(pred) {
 		    if(classid[pred.real] == i) {
-			var cross = paper.circle(x+scatter(opts.scatter), 14+(heigth/2)*(1-pred.predictions[0].probability), 3)
-			    .attr({
-				stroke: colors[classid[pred.predictions[0].class]]
-			    });
-			points.push(cross);
+			for(var pi = 0; pi < pred.predictions.length; pi++) {
+			    if(pi > 0 && opts.only_best) {
+				break;
+			    }
+			    var pp = pred.predictions[pi]
+			    if(pp.probability >= 0.1) {
+				var cross = paper.circle(x+scatter(opts.scatter), 10+(heigth/2)*(1-pp.probability), 3)
+				    .attr({
+					fill: colors[classid[pp.class]],
+					stroke: colors[classid[pp.class]],
+					"fill-opacity": 0.0
+				    });
+				box.points.push(cross);
+			    }
+			}
 		    }
 		})(predictions.predictions[p]);
 	    }	    
