@@ -81,7 +81,7 @@
 	    lineset.line = line;
 	    lineset.box = box;
 	    lineset.push(box);
-	    line.attr({"stroke-width": 2, "stroke": "#333"});
+	    line.attr({"stroke-width": 2, "stroke": "#333", "stroke-opacity": 0.5, "stroke-dasharray": "-"});
 	    lineset.push(line);
 	    circle = paper.circle(x, 5, 4).attr({stroke: "black" , fill: colors[i] || "black"});
 	    lineset.push(circle);
@@ -118,8 +118,8 @@
 				break;
 			    }
 			    var pp = pred.predictions[pi]
-			    if(pp.probability >= 0.1) {
-				var cross = paper.circle(x+scatter(opts.scatter), 10+(heigth/2)*(1-pp.probability), 3)
+			    if(pp.probability >= 0.14) {
+				var cross = paper.circle(x+scatter(opts.scatter), 14+(heigth/2)*(1-pp.probability), 3)
 				    .attr({
 					fill: colors[classid[pp.class]],
 					stroke: colors[classid[pp.class]],
