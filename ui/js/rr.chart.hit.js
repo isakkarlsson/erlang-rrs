@@ -46,12 +46,14 @@
 	    gradetext.push(t);
 	    gradeset.push(grade);
 	}
+
 	chart.push(gradeset);
 	gradeset.attr({
 	    "stroke-dasharray": "-",
 	    "stroke-width": 1,
 	    stroke: "#efefef",
-	    fill: "#fff"
+	    fill: "#fff",
+	    "fill-opacity": 0.0
 	}).toBack();
 	gradetext.attr({
 	    fill: "#333",
@@ -63,7 +65,17 @@
 	    "stroke-width": 1,
 	    stroke: "#efefef"
 	});
-	
+	var majority_r = ((width/2)/10)*(1/predictions.classes.length)*10-10;
+	if(majority_r > 0) {
+	    var majority = paper.circle(x, heigth/2, majority_r);
+	    majority.attr({
+		stroke: "#f86f6f",
+		"stroke-opacity": 0.2,
+		"fill-opacity": 0.01,
+		fill: " #df3e3e"
+	    }).toBack();
+	}
+
 	var text_y = heigth+20,
 	    text_x = x-width/2,
 	    widest = 0;
