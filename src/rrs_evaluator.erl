@@ -85,7 +85,7 @@ json({Pred, Rest}) ->
     [{prediction, json_pred(Pred)},
      {probabilities, lists:map(fun json_pred/1, Rest)}].
 
-json_pred({Class, Prob}) ->
+json_pred({Class, Prob, _Votes}) ->
     [{class, rrs_json:sanitize(Class)},
      {prob, Prob}].
 

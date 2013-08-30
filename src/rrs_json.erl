@@ -41,8 +41,10 @@ convert_predictions(Preds, Examples) ->
 		    {real, atom_to_binary(Real, utf8)},
 		    {predictions, 
 		     lists:reverse(lists:foldl(
-				     fun ({Class, Prob}, PredAcc) ->
-					     [[{class, atom_to_binary(Class, utf8)}, {probability, Prob}]|PredAcc]
+				     fun ({Class, Prob, Votes}, PredAcc) ->
+					     [[{class, atom_to_binary(Class, utf8)}, 
+					       {probability, Prob},
+					       {votes, Votes}]|PredAcc]
 				     end, [], Pred))}]|Acc]
 	  end, [], Preds),
     Classes = lists:map(

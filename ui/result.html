@@ -23,6 +23,7 @@
     <script src="js/g.pie-min.js"></script>
     <script src="js/g.line-min.js"></script>
     <script src="js/g.bar-min.js"></script>
+    <script src="js/g.dot-min.js"></script>
 
     <script src="js/rr.js"></script>    
     <script src="js/rr.ui.js"></script>    
@@ -171,14 +172,32 @@
 	<h1>HitChart<sup class="help" help="Visualizes the hit rate of the classifier">?</sup></h1>
 	<div class="main-contents">
 	  <div class="main-container">
-	    <div  style="width:50%; margin: auto;">
+	    <div style="width:50%; margin: auto;">
 	      <strong style="margin-right: 28px;">Scatter<sup class="help" help="Increase scatter">?</sup>: </strong>
 	      <div id="scatter-slide" style="display: inline-block; width: 200px;"></div> <br />
-	      <strong style="margin-right: 10px;">Only best<sup class="help" help="Only show predictions which receive a majority vote">?</sup>: </strong>
-	      <input type="checkbox" id="only-predictions" style="display: inline-block;" checked="checked" /> 
+	      <strong style="margin-right: 10px;">Only
+	      best<sup class="help" help="Only show predictions which
+	      receive a majority vote">?</sup>: </strong>
+	      <input type="checkbox" id="only-predictions"
+	      style="display: inline-block;" checked="checked" />
 	    </div>
 	    <div id="hit-graph" style="width:700px; margin: 20px auto; height: 700px"></div>
+	  </div>
+	</div>
+      </div>      
+    </div>
 
+    <div class="slide" id="hitchart">
+      <div class="main">
+	<h1>Probability histogram<sup class="help" help="Visualizes the predictions after n trees">?</sup></h1>
+	<div class="main-contents">
+	  <div class="main-container">
+	    <div style="width:50%; margin: auto;">
+	      <strong style="margin-right: 28px;">Sample<sup class="help" help="Randomly sample a set of examples to vizualize">?</sup>: </strong>
+	      <div id="histogram-slide" style="display: inline-block; width: 200px;"></div>
+	      <span id="histogram-slide-count" style="margin-left: 12px"></span>
+	    </div>
+	    <div id="histogram" style="width:700px; margin: 20px auto; height: 700px"></div>
 	  </div>
 	</div>
       </div>      

@@ -180,8 +180,109 @@ $(document).ready(function() {
 	    hitchart(data.predictions, $("#scatter-slide").slider("value"), $(this).prop("checked"));
 	});
 	hitchart(data.predictions, $("#scatter-slide").slider("value"), $("#only-predictions").prop("checked"));
+	var v = data.predictions.predictions.length > 100 ? 100 : data.predictions.predictions.length;
+	$("#histogram-slide-count").text(v + "/" + data.predictions.predictions.length);
+	console.log(v);
+	$("#histogram-slide").slider({
+	    range: "min",
+	    value: v,
+	    max: data.predictions.predictions.length,
+	    min: 10,
+	    step: 10,
+	    slide: function(event, ui) {
+		$("#histogram-slide-count").text(ui.value + "/" + data.predictions.predictions.length);
+		predictionHistogram(data.predictions, ui.value);
+	    }
+	});
+	predictionHistogram(data.predictions, v);
     }
 
+    function predictionHistogram(pred, max) {
+	$("#histogram").html("");
+	var p = getRandomSubarray(pred.predictions, max);
+	var hist = [];
+	for(var i = 0; i < p.length; i++) {
+	    var ex = p[i], h_ex = [0];
+	    var votes = ex.predictions[0].votes, pos = 0, neg = 0;
+	    for(var v = 0; v < votes.length; v++) {
+		if(votes[v] == 1) {
+		    pos += 1;
+		} else {
+		    neg += 1;
+		}
+		if(v % 10 == 0) {
+		    h_ex.push(pos/(neg+pos));
+		}
+	    }
+	    hist.push(h_ex);
+	}
+	console.log(seq(0, hist[0].length*10-10, 10));
+	console.log(hist);
+	var r = Raphael("histogram");
+	var c = r.linechart(40, 10, 620, 500, seq(0, hist[0].length*10-10, 10), hist, {
+	    axis: "0 0 1 1",
+	    colors: rainbow_seq(max),
+	    axisxstep: 10,
+	    smooth: true
+	});
+	c.lines.attr({"stroke-width": 1});
+    }
+
+    function seq(start, end, step) {
+	var r = [];
+	for(var i = start; i <= end; i+=step) {
+	    r.push(i);
+	}
+	return r;
+    }
+    
+    function rainbow_seq(total) {
+	var l =[];
+	for(i = 1; i <= total; i++) {
+	    l.push(rainbow(total, i));
+	}
+	return l;
+    }
+
+    // http://stackoverflow.com/questions/11935175/sampling-a-random-subset-from-an-array
+    function getRandomSubarray(arr, size) {
+	if(size >= arr.length) {
+	    return arr;
+	}
+	var shuffled = arr.slice(0), i = arr.length, min = i - size, temp, index;
+	while (i-- > min) {
+            index = Math.floor(i * Math.random());
+            temp = shuffled[index];
+            shuffled[index] = shuffled[i];
+            shuffled[i] = temp;
+	}
+	return shuffled.slice(min);
+    }
+    
+    function rainbow(numOfSteps, step) {
+	// This function generates vibrant, "evenly spaced" colours
+	// (i.e. no clustering). This is ideal for creating easily
+	// distinguishable vibrant markers in Google Maps and other
+	// apps.  Adam Cole, 2011-Sept-14 HSV to RBG adapted from:
+	// http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+	var r, g, b;
+	var h = step / numOfSteps;
+	var i = ~~(h * 6);
+	var f = h * 6 - i;
+	var q = 1 - f;
+	switch(i % 6){
+        case 0: r = 1, g = f, b = 0; break;
+        case 1: r = q, g = 1, b = 0; break;
+        case 2: r = 0, g = 1, b = f; break;
+        case 3: r = 0, g = q, b = 1; break;
+        case 4: r = f, g = 0, b = 1; break;
+        case 5: r = 1, g = 0, b = q; break;
+	}
+	var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + 
+	    ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + 
+	    ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+	return (c);
+    }
     function hitchart(pred, scatter, only_best) {
 	console.log("only best", only_best);
 	$("#hit-graph").html("");
