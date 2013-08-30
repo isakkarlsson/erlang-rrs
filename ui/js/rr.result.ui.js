@@ -1,5 +1,8 @@
 $(document).ready(function() {
-    $.blockUI({ message: '<img style="padding-top: 10px" src="css/ajax-loader.gif" /> <p>Loading result...</p>' }); 
+    $.blockUI({ message: '<div id="page-progress" style="margin: 10px"></div><p>Loading result...</p>' });
+    $("#page-progress").progressbar({
+	value: 0
+    });
     $("#loading-error-btn").button().click(function() {
 	window.location.href = "/result.html?id=" + $("#loading-error input[type=text]").val();
     });
@@ -49,6 +52,19 @@ $(document).ready(function() {
     });
 
     $.ajax({
+	xhr: function () {
+	    var xhr = new window.XMLHttpRequest();
+	    xhr.addEventListener("progress", function(evt){
+		if (evt.lengthComputable) {
+		    var pc = evt.loaded / evt.total;
+		    $("#page-progress").progressbar("value", pc*100);
+		    if(pc == 1) {
+			$("#page-progress").progressbar("option", "value", false);
+		    }
+		}
+	    }, false);
+	    return xhr;
+	},
 	type: "get",
 	dataType: "json",
 	url: "api/result/get/" + $.getUrl("id"),
