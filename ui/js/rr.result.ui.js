@@ -57,10 +57,13 @@ $(document).ready(function() {
 	    xhr.addEventListener("progress", function(evt){
 		if (evt.lengthComputable) {
 		    var pc = evt.loaded / evt.total;
+		    console.log(pc);
 		    $("#page-progress").progressbar("value", pc*100);
 		    if(pc == 1) {
 			$("#page-progress").progressbar("option", "value", false);
 		    }
+		} else {
+		    $("#page-progress").progressbar("option", "value", false);
 		}
 	    }, false);
 	    return xhr;
@@ -478,7 +481,8 @@ $(document).ready(function() {
 	var pie = r.piechart(opts.x, opts.y, 100, opts.data, {
 	    legend: opts.legends,
 	    legendpos: opts.legendpos,
-	    sort: false
+	    sort: false,
+	    minPercent: -1
 	});
 	opts.animate(pie);
 			     
