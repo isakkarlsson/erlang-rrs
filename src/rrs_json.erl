@@ -73,7 +73,11 @@ convert_cv_folds([{{_, Fold}, Measures}|Rest], Acc) ->
 			     {measures,convert_cv_measures(Measures)}]|Acc]).
 
 convert_cv_measures(Measures) ->
-    lists:foldl(fun ({Key, {PerClass, Avg}}, Acc) ->
+    lists:foldl(fun ({Key, {Type, Values, Average}}, Acc) ->
+			[{Key, [{average, Average}|lists:map(fun ({K, {_, V}}) -> {K, sanitize(V)} end, Values)]}|Acc];
+		    ({Key, Value}, Acc) ->
+			[{Key, sanitize(Value)}|Acc];		    
+		    ({Key, {PerClass, Avg}}, Acc) ->
 			[{Key, [{average, Avg}|lists:map(fun ({K, {_, V}}) -> {K, sanitize(V)} end, PerClass)]}|Acc];
 		    ({Key, Value}, Acc) when is_list(Value) ->
 			[{Key, lists:map(fun ({K, V}) -> {K, sanitize(V)} end, Value)}|Acc];
