@@ -1,17 +1,17 @@
 -module(rrs_experiment).
 
 -export([
-	 init/3,
-	 websocket_init/3,
-	 websocket_handle/3,
-	 websocket_info/3,
-	 websocket_terminate/3
-	]).
+         init/3,
+         websocket_init/3,
+         websocket_handle/3,
+         websocket_info/3,
+         websocket_terminate/3
+        ]).
 
 -export([
-	 spawn_model_evaluator/2,
-	 spawn_model_evaluator/5
-	]).
+         spawn_model_evaluator/2,
+         spawn_model_evaluator/5
+        ]).
 
 %% @headerfile "rrs.hrl"
 -include("rrs.hrl").
@@ -36,10 +36,10 @@ websocket_handle_json(error, Req, State) ->
 websocket_handle_json(Obj, Req, State) ->
     Current = State#rrs_experiment.current,
     if Current == undefined -> %% note: only one experiment per client
-	    Process = spawn_model(Obj),
-	    {ok, Req, #rrs_experiment{current=Process}};
+            Process = spawn_model(Obj),
+            {ok, Req, #rrs_experiment{current=Process}};
        true ->
-	    {reply, {text, rrs_json:error("invalid-experiment")}, Req, State}
+            {reply, {text, rrs_json:error("invalid-experiment")}, Req, State}
     end.
     
 %% @doc send messages to the client
@@ -69,24 +69,24 @@ parse_file_json(Json) ->
 parse_evaluator_json(Json) ->
     Eval = proplists:get_value(<<"evaluator">>, Json),
     case proplists:get_value(<<"id">>, Eval) of
-	<<"cross-validation">> ->
-	    {cv, 
-	     proplists:get_value(<<"folds">>, Eval),
-	     proplists:get_value(<<"store">>, Eval) == <<"yes">>
-	    };
-	undefined ->
-	    throw({error})
+        <<"cross-validation">> ->
+            {cv, 
+             proplists:get_value(<<"folds">>, Eval),
+             proplists:get_value(<<"store">>, Eval) == <<"yes">>
+            };
+        undefined ->
+            throw({error})
     end.
 
 parse_machine_json(Json) ->
     Machine = proplists:get_value(<<"learner">>, Json),
     case proplists:get_value(<<"id">>, Machine) of
-	<<"rf">> ->
-	    Args = rf:args(Machine, fun (R, V) -> rr_log:info("~p ~p", [R, V]), undefined end),
-	    rr_log:info("~p", [Args]),
-	    Args;
-	_ ->
-	    []
+        <<"rf">> ->
+            Args = rf:args(Machine, fun (R, V) -> rr_log:info("~p ~p", [R, V]), undefined end),
+            rr_log:info("~p", [Args]),
+            Args;
+        _ ->
+            []
     end.
 
 spawn_model(Props) ->
@@ -105,68 +105,69 @@ spawn_model_evaluator(Self, Props) ->
     ExSet = rr_example:load(Csv, 4),
     Pid = spawn_link(?MODULE, spawn_model_evaluator, [Self, Eval, Machine, Props, ExSet]),
     receive
-	{'EXIT', _, terminate} ->
-	    rr_log:debug("terminating model ~p", [Pid]),
-	    exit(Pid),
-	    csv:kill(Csv),
-	    rr_example:kill(ExSet),
-	    ok
+        {'EXIT', _, terminate} ->
+            rr_log:debug("terminating model ~p", [Pid]),
+            exit(Pid),
+            csv:kill(Csv),
+            rr_example:kill(ExSet),
+            ok
     end.
 
 spawn_model_evaluator(Self, Eval, Machine, Props, ExSet) ->
     try
-	case Eval of
-	    {cv, NoFolds, Store} ->
-		Progress = fun (done, done) ->
-				   Self ! {progress, 100};
-			       (X, Y) -> 
-				   Self ! {progress, round((X/Y)*100)}
-			   end,
-		Rf = rf:new(Machine ++ [{progress, Progress}]),
-		Build = rf:partial_build(Rf),
-		Evaluate = rf:partial_evaluate(Rf),
-		{Result, _M} = cross_validation:evaluate(
-				 ExSet,
-				 [{build, Build},
-				  {folds, NoFolds},
-				  {evaluate, rf:killer(Evaluate)}, 
-				  {progress, fun (Fold) -> 
-						     Self ! {progress, 0},
-						     Self ! {message, io_lib:format("Running fold ~p of ~p", 
-										    [Fold, NoFolds])}
-					     end}]),
-		#rr_exset {
-		   features = Features,
-		   examples = Examples, 
-		   exconf = ExConf
-		  } = ExSet,
-		BinaryModel = if Store ->
-				      Self ! {progress, 0},
-				      Self ! {message, "Storing model of complete data set"},
-				      Model = Build(Features, Examples, ExConf),
-				      rf:serialize(Rf, Model);
-				 true ->
-				      undefined
-			      end,
-		Ex = #rrs_experiment_data {
-			model = BinaryModel,
-			properties = Props,
-			evaluation = Result,
-			predictions = rr_example:predictions(ExConf, Examples),
-			classes = lists:map(fun ({Class, Count, _}) -> {Class, Count} end, Examples),
-			features = lists:map(fun ({Type, Id}) -> 
-						     {Type, rr_example:feature_name(ExConf, Id)}
-					     end, Features)
-		       },
-		Self ! {completed, Ex};
-	    _ ->
-		ok
-	end
+        case Eval of
+            {cv, NoFolds, Store} ->
+                Progress = fun (done, done) ->
+                                   Self ! {progress, 100};
+                               (X, Y) -> 
+                                   Self ! {progress, round((X/Y)*100)}
+                           end,
+                Rf = rf:new(Machine ++ [{progress, Progress}]),
+                Build = rf:partial_build(Rf),
+                Evaluate = rf:partial_evaluate(Rf),
+                Kill = rr_classifier:kill(rf, Evaluate),
+                {Result, _M} = cross_validation:evaluate(
+                                 ExSet,
+                                 [{build, Build},
+                                  {folds, NoFolds},
+                                  {evaluate, Kill},
+                                  {progress, fun (Fold) -> 
+                                                     Self ! {progress, 0},
+                                                     Self ! {message, io_lib:format("Running fold ~p of ~p", 
+                                                                                    [Fold, NoFolds])}
+                                             end}]),
+                #rr_exset {
+                   features = Features,
+                   examples = Examples, 
+                   exconf = ExConf
+                  } = ExSet,
+                BinaryModel = if Store ->
+                                      Self ! {progress, 0},
+                                      Self ! {message, "Storing model of complete data set"},
+                                      Model = Build(Features, Examples, ExConf),
+                                      rf:serialize(Rf, Model);
+                                 true ->
+                                      undefined
+                              end,
+                Ex = #rrs_experiment_data {
+                        model = BinaryModel,
+                        properties = Props,
+                        evaluation = Result,
+                        predictions = rr_example:predictions(ExConf, Examples),
+                        classes = lists:map(fun ({Class, Count, _}) -> {Class, Count} end, Examples),
+                        features = lists:map(fun ({Type, Id}) -> 
+                                                     {Type, rr_example:feature_name(ExConf, Id)}
+                                             end, Features)
+                       },
+                Self ! {completed, Ex};
+            _ ->
+                ok
+        end
     catch
-	X:Y ->
-	    rr_log:debug("build failed with reason: ~p", [{X, Y}]),
-	    erlang:display(erlang:get_stacktrace()),
-	    Self ! {error, "build-fail"}
+        X:Y ->
+            rr_log:debug("build failed with reason: ~p", [{X, Y}]),
+            erlang:display(erlang:get_stacktrace()),
+            Self ! {error, "build-fail"}
     end.
 
 

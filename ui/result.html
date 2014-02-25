@@ -17,6 +17,7 @@
     <script src="js/chosen.jquery.min.js" type="text/javascript"></script>
     <script src="js/jquery.blockUI.js" type="text/javascript"></script>
     <script src="js/jquery.json-2.4.min.js" type="text/javascript"></script>    
+    <script src="js/rainbowvis.js"></script>
 
     <script src="js/raphael-min.js"></script>
     <script src="js/g.raphael-min.js"></script>
@@ -29,6 +30,7 @@
     <script src="js/rr.ui.js"></script>    
     <script src="js/rr.graphs.auc.js"></script>    
     <script src="js/rr.graphs.value.js"></script>
+    <script src="js/rr.graphs.ball.js"></script>
     <script src="js/rr.chart.hit.js"></script>
     <script src="js/rr.result.ui.js"></script>
 
@@ -38,35 +40,35 @@
     <div id="loading-error" style="display:none; text-aling: left">
       <h1>Error</h1>
       <p style="text-align: left; padding: 10px">We were unfortunately unable to process your request. This can be due to numerous reasons. For example:
-	<ul style="text-align: left">
-	  <li>You entered an incorrect result ID.</li>
-	  <li>There are no generated models (generate a new model <a href="index.html">here</a>).</li>
-	</ul>
-	If you have a result ID enter it here: <input type="text" size="2" />
-	<input id="loading-error-btn" type="submit" value="Load result ID" />
+        <ul style="text-align: left">
+          <li>You entered an incorrect result ID.</li>
+          <li>There are no generated models (generate a new model <a href="index.html">here</a>).</li>
+        </ul>
+        If you have a result ID enter it here: <input type="text" size="2" />
+        <input id="loading-error-btn" type="submit" value="Load result ID" />
       </p>
     </div>
     <div id="use-model-dialog" style="display:none; text-align: left"
-	 title="Use Model to Classify Custom Example">
+         title="Use Model to Classify Custom Example">
       <div class="selector-lip">
-	<h2>Attributes<sup class="help" help="Insert the values for this example">?</sup></h2>
-	<table class="attributes inner-shadow">
-	  
-	</table>
-	<div class="selector-lip-foot">
-	  <a href="#" id="evaluate" class="selector-button confirm green inner-shadow help" key="evaluate"
-	     help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
-	    Evaluate
-	  </a>
-	</div>
-	<div id="prediction-content" style="display:none; border-top: 1px solid rgba(0,0,0,0.32); padding: 7px; margin-top: 5px;">
-	  <div id="predicted" class="inner-shadow green" 
-	       style="text-align: center; color: #fff;text-shadow: rgb(0, 0, 0) 0px 1px 2px;">
-	  </div>
-	  <div id="prediction-result" style="widht:500px">
-	    
-	  </div>
-	</div>
+        <h2>Attributes<sup class="help" help="Insert the values for this example">?</sup></h2>
+        <table class="attributes inner-shadow">
+          
+        </table>
+        <div class="selector-lip-foot">
+          <a href="#" id="evaluate" class="selector-button confirm green inner-shadow help" key="evaluate"
+             help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
+            Evaluate
+          </a>
+        </div>
+        <div id="prediction-content" style="display:none; border-top: 1px solid rgba(0,0,0,0.32); padding: 7px; margin-top: 5px;">
+          <div id="predicted" class="inner-shadow green" 
+               style="text-align: center; color: #fff;text-shadow: rgb(0, 0, 0) 0px 1px 2px;">
+          </div>
+          <div id="prediction-result" style="widht:500px">
+            
+          </div>
+        </div>
       </div>
     </div>
 
@@ -77,143 +79,157 @@
     <div id="machine-learner-message" class="message-container transparent-background inner-shadow">
       <a class="boxclose" id="boxclose">X</a>
       <div id="model-tools" style="padding: 10px" style="display:none">
-	<a href="#" id="use-model" class="selector-button orange inner-shadow">Use Model</a>
-		
-	<a href="#" id="download-model" class="selector-button green inner-shadow">Download Model</a>
+        <a href="#" id="use-model" class="selector-button orange inner-shadow">Use Model</a>
+                
+        <a href="#" id="download-model" class="selector-button green inner-shadow">Download Model</a>
       </div>
       
       <div id="dataset" class="message gray inner-shadow">
-    	<h2>Dataset</h2>
-	<p>
-	  <table class="attributes">
-	  </table>
-	</p>
+        <h2>Dataset</h2>
+        <p>
+          <table class="attributes">
+          </table>
+        </p>
       </div>
       <div id="learner" class="message gray inner-shadow">
-    	<h2>Machine Learner</h2>
-	<p>
-	  <table class="attributes">
-	  </table>
-	</p>
+        <h2>Machine Learner</h2>
+        <p>
+          <table class="attributes">
+          </table>
+        </p>
       </div>
       <div id="evaluation" class="message gray inner-shadow">
-    	<h2>Evaluation</h2>
-	<p>
-	  <table class="attributes">
-	  </table>
-	</p>
+        <h2>Evaluation</h2>
+        <p>
+          <table class="attributes">
+          </table>
+        </p>
       </div>
     </div>
     <div id="top-panel" class="gray">
       <ul class="top-menu">
-	<li>
-	  <a href="#class-statistics" class="nav-button">Class statistics</a>
-	</li>
-	<li>
-	  <a href="#auc" class="nav-button">Area Under Curve</a>
-	</li>
-	<li>
-	  <a href="#statistics" class="nav-button">Model statistics</a>
-	</li>
-	<li>
-	  <a href="#hitchart" class="nav-button">Example Statistics</a>
-	</li>
-	<li>
-	  <a href="#other" class="nav-button">Other Evaluations</a>
-	</li>
+        <li>
+          <a href="#class-statistics" class="nav-button">Class statistics</a>
+        </li>
+        <li>
+          <a href="#auc" class="nav-button">Area Under Curve</a>
+        </li>
+        <li>
+          <a href="#statistics" class="nav-button">Model statistics</a>
+        </li>
+        <li>
+          <a href="#hitchart" class="nav-button">Example Statistics</a>
+        </li>
+        <li>
+          <a href="#other" class="nav-button">Other Evaluations</a>
+        </li>
       </ul>
     </div>
 
     <div class="slide" id="class-statistics">
       <div class="main">
-	<h1>Class statistics<sup class="help" help="This shows the class statistics of the
-	model. If the prior and posterior distribution is very
-	skewed, the model is likley to be bad.">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container">
-	    <div id="class-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
-	  </div>
-	</div>
+        <h1>Class statistics<sup class="help" help="This shows the class statistics of the
+        model. If the prior and posterior distribution is very
+        skewed, the model is likley to be bad.">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container">
+            <div id="class-graphs" style="width:1000px; margin: 20px auto; height: 700px"></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="slide" id="auc">
       <div class="main">
-	<h1>Area under the ROC-curve<sup class="help"
-					 help="The AUC curves are calculated from the predicted probabilities for the
-					       entire data set when doing cross-validation. Therefore, the area is calculated as the
-					       average of each fold. Thus, the number show and the curve will not necessarily 
-					       correspond entirely (especially if the number of examples of a certain class is smaller
-					       than the number of folds).">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container">
-	    <div id="auc-graph" style="width:1000px; margin: 20px auto; height: 700px"></div>
-	  </div>
-	</div>
+        <h1>Area under the ROC-curve<sup class="help"
+                                         help="The AUC curves are calculated from the predicted probabilities for the
+                                               entire data set when doing cross-validation. Therefore, the area is calculated as the
+                                               average of each fold. Thus, the number show and the curve will not necessarily 
+                                               correspond entirely (especially if the number of examples of a certain class is smaller
+                                               than the number of folds).">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container">
+            <div id="auc-graph" style="width:1000px; margin: 20px auto; height: 700px"></div>
+          </div>
+        </div>
       </div>      
     </div>
     
     <div class="slide" id="statistics">
       <div class="main">
-	<h1>Model statistics<sup class="help" help="This shows how
-	good the model is at predicting. If the model is very skewed,
-	accuracy is unlikely a good estimator of the models
-	performance">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container" style="display: inline-block; overflow: hidden;">
-	    <div id="basic-graphs" style="width: 700px; margin: 20px auto; height: 700px;"></div>
-	  </div>
-	</div>
+        <h1>Model statistics<sup class="help" help="This shows how
+        good the model is at predicting. If the model is very skewed,
+        accuracy is unlikely a good estimator of the models
+        performance">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container" style="display: inline-block; overflow: hidden;">
+            <div id="basic-graphs" style="width: 700px; margin: 20px auto; height: 700px;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <div class="slide" id="variable-importance">
+      <div class="main">
+        <h1>Variable Importance<sup class="help" help="Visualizes the
+        relative importance of predictors in the model.">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container">
+            <div id="vi" style="width: 700px; margin: 20px auto; height: 700px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
     <div class="slide" id="hitchart">
       <div class="main">
-	<h1>HitChart<sup class="help" help="Visualizes the hit rate of the classifier">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container">
-	    <div style="width:50%; margin: auto;">
-	      <strong style="margin-right: 28px;">Scatter<sup class="help" help="Increase scatter">?</sup>: </strong>
-	      <div id="scatter-slide" style="display: inline-block; width: 200px;"></div> <br />
-	      <strong style="margin-right: 10px;">Only
-	      best<sup class="help" help="Only show predictions which
-	      receive a majority vote">?</sup>: </strong>
-	      <input type="checkbox" id="only-predictions"
-	      style="display: inline-block;" checked="checked" />
-	    </div>
-	    <div id="hit-graph" style="width:700px; margin: 20px auto; height: 700px"></div>
-	  </div>
-	</div>
+        <h1>HitChart<sup class="help" help="Visualizes the hit rate of the classifier">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container">
+            <div style="width:50%; margin: auto;">
+              <strong style="margin-right: 28px;">Scatter<sup class="help" help="Increase scatter">?</sup>: </strong>
+              <div id="scatter-slide" style="display: inline-block; width: 200px;"></div> <br />
+              <strong style="margin-right: 10px;">Only
+              best<sup class="help" help="Only show predictions which
+              receive a majority vote">?</sup>: </strong>
+              <input type="checkbox" id="only-predictions"
+              style="display: inline-block;" checked="checked" />
+            </div>
+            <div id="hit-graph" style="width:700px; margin: 20px auto; height: 700px"></div>
+          </div>
+        </div>
       </div>      
     </div>
 
     <div class="slide" id="hitchart">
       <div class="main">
-	<h1>Probability histogram<sup class="help" help="Visualizes the predictions after n trees">?</sup></h1>
-	<div class="main-contents">
-	  <div class="main-container">
-	    <div style="width:50%; margin: auto;">
-	      <strong style="margin-right: 28px;">Sample<sup class="help" help="Randomly sample a set of examples to vizualize">?</sup>: </strong>
-	      <div id="histogram-slide" style="display: inline-block; width: 200px;"></div>
-	      <span id="histogram-slide-count" style="margin-left: 12px"></span>
-	    </div>
-	    <div id="histogram" style="width:700px; margin: 20px auto; height: 700px"></div>
-	  </div>
-	</div>
+        <h1>Probability histogram<sup class="help" help="Visualizes the predictions after n trees">?</sup></h1>
+        <div class="main-contents">
+          <div class="main-container">
+            <div style="width:50%; margin: auto;">
+              <strong style="margin-right: 28px;">Sample<sup class="help" help="Randomly sample a set of examples to vizualize">?</sup>: </strong>
+              <div id="histogram-slide" style="display: inline-block; width: 200px;"></div>
+              <span id="histogram-slide-count" style="margin-left: 12px"></span>
+            </div>
+            <div id="histogram" style="width:700px; margin: 20px auto; height: 700px"></div>
+          </div>
+        </div>
       </div>      
     </div>
 
     <div class="slide" id="other">
       <div class="main">
-	<h1>Other measures</h1>
-	<div class="main-contents">
-	  <table class="attributes inner-shadow" style="width: 80%; margin:20px auto; padding:5px">
-	  </table>
-	</div>
+        <h1>Other measures</h1>
+        <div class="main-contents">
+          <table class="attributes inner-shadow" style="width: 80%; margin:20px auto; padding:5px">
+          </table>
+        </div>
       </div>
     </div>
     
     <div id="build-information">
-    </div>	
+    </div>      
   </body>
 </html>
