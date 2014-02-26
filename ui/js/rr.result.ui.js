@@ -21,7 +21,7 @@ $(document).ready(function() {
         $("#machine-learner-message").hide("slide");
     });
 
-   
+    
     $(".help").live({
         mouseenter: function() {
             var build = $("#build-information");
@@ -92,6 +92,7 @@ $(document).ready(function() {
             $("#use-model").click(function() {
                 $("#use-model-dialog").dialog({
                     modal: true,
+                    closeOnEscape: false,
                     autoResize:true,
                     width: 500,
                     position: {
@@ -109,16 +110,59 @@ $(document).ready(function() {
     }
 
     function loadFeatures(that, data) {
+        $("#attributes-show-all").toggle(function() {
+            $(this).text("Hide all");
+            $("#use-model-dialog .attributes tr").show("fade")
+        }, function() {
+            $(this).text("Show all");
+            $("#use-model-dialog .attributes tr").hide("fade")
+        });
         var table = $("#use-model-dialog .attributes").html("");
+        var idx = 0
         for(f in data.features) {
-            (function(feature) {
-                table.append("<tr>" +
+            (function(feature, id) {
+                feature.id = id
+                feature.label = feature.name
+                var value = feature.type == "categoric" ? "no" : "0";
+                table.append("<tr style='display:none' id='feature_" + id + "_" + feature.name.replace(" ", "_") + "'>" +
                              "<td class='attr-key'>" + feature.name + "</td>" + 
                              "<td class='attr-type'>" + feature.type + "</td>" + 
-                             "<td class='attr-value'><input type='text' /></td>" +
+                             "<td class='attr-value'><input type='text' value='" + value + "'/></td>" +
                              "</tr>");
-            })(data.features[f])
+            })(data.features[f], ++idx)
         }
+        $("#attribute-search").autocomplete({
+            minLength: 1,
+            source: data.features,
+            focus: function (event, ui) {
+                $("#attribute-search").val(ui.item.name)
+                return false
+            },
+            select: function( event, ui ) {
+                $("#attribute-search").hide()
+                $("#attribute-search-text").html("Insert value:")
+                $("#attribute-value").data("item", ui.item).show().select()
+                return false;
+            }
+        });
+
+        $("#attribute-value").keydown(function(e) {
+            var item = $(this).data("item")
+            if(e.keyCode == 13) {
+                $("#feature_" + item.id + "_" + item.name.replace(" ", "_"))
+                    .show("fade")
+                    .find("input")
+                    .val($("#attribute-value").val())
+                $("#attribute-search-text").html("Search for attribute:")
+                $("#attribute-value").hide()
+                $("#attribute-search").val("").show().select();
+            } else if (e.keyCode == 27) {
+                $("#attribute-search-text").html("Search for attribute:")
+                $("#attribute-value").hide()
+                $("#attribute-search").show().select()
+            }
+        });
+        
         $("#evaluate").click(function() {
             rr.client("ws://" + window.location.host + "/api/evaluator", {
                 message: function (data) {
@@ -151,9 +195,9 @@ $(document).ready(function() {
     }
 
     function collect_evaluation(s) {
-        var types = $.makeArray($(s + " .attr-type").map(function(){ console.log(this); return $(this).text(); }));
+        var types = $.makeArray($(s + " .attr-type").map(function(){ return $(this).text(); }));
         types.push("Class");
-        var names = $.makeArray($(s + " .attr-key").map(function(){ console.log(this); return $(this).text(); }));
+        var names = $.makeArray($(s + " .attr-key").map(function(){ return $(this).text(); }));
         names.push("Class");
         var values = $.makeArray($(s + " .attr-value").map(function(){ 
             var tmp = $(this).children().first().val();
@@ -169,9 +213,9 @@ $(document).ready(function() {
         console.log(combined);
         return combined;
 
-/* "numeric, numeric, numeric, numeric, class\r\n"+
-            "Spetal Length, Sepal Widht, Petal Length, Petal Width, Class\r\n" +
-            "1.1,2.5,4.2,3.1,?\r\n";*/
+        /* "numeric, numeric, numeric, numeric, class\r\n"+
+           "Spetal Length, Sepal Widht, Petal Length, Petal Width, Class\r\n" +
+           "1.1,2.5,4.2,3.1,?\r\n";*/
         
     }
 
@@ -381,7 +425,7 @@ $(document).ready(function() {
             y: 360,
             width: 300,
             height: 200});
-            
+        
     }
 
     function countPredictedClasses(predictions) {
@@ -396,10 +440,10 @@ $(document).ready(function() {
         res = [], labels = [];
         for(c in predictions.classes) {
             var pre = tmp[predictions.classes[c].class];
-//          if(pre != undefined && pre > 1) {
-                labels.push(predictions.classes[c].class);
-                res.push(tmp[predictions.classes[c].class]);
-//          }       
+            //          if(pre != undefined && pre > 1) {
+            labels.push(predictions.classes[c].class);
+            res.push(tmp[predictions.classes[c].class]);
+            //          }       
         }
         return { data: res, labels: labels };
     }
@@ -476,9 +520,9 @@ $(document).ready(function() {
         for(key in avg) {
             $("#other .attributes").append(
                 "<tr>" +
-                "  <td class='attr-key'>" + key+ "</td>" +
-                "  <td class='attr-value'>" + out(avg[key]) + "</td>" +                 
-                "</tr>");
+                    "  <td class='attr-key'>" + key+ "</td>" +
+                    "  <td class='attr-value'>" + out(avg[key]) + "</td>" +                 
+                    "</tr>");
         }
     }
 
@@ -491,7 +535,7 @@ $(document).ready(function() {
             minPercent: -1
         });
         opts.animate(pie);
-                             
+        
     }
 
     function drawAccuracy(r, a, opts) {
@@ -553,9 +597,9 @@ $(document).ready(function() {
         for(key in data) {
             attrs.append(
                 "<tr>" + 
-                "  <td class='attr-key'>" + key + "</td>" +
-                "  <td class='attr-value'>" + data[key] + "</td>" +
-                "</tr>");
+                    "  <td class='attr-key'>" + key + "</td>" +
+                    "  <td class='attr-value'>" + data[key] + "</td>" +
+                    "</tr>");
         }
     }
 
@@ -613,113 +657,113 @@ $(document).ready(function() {
     }
 });
 /*
-var r = Raphael("canvas");
-var MAX_WIDTH = 600
-var RADIUS = 5
-var PADDING = 4
+  var r = Raphael("canvas");
+  var MAX_WIDTH = 600
+  var RADIUS = 5
+  var PADDING = 4
 
-var random = function(max) {
-    return Math.floor((Math.random()*max)+1);   
-}
+  var random = function(max) {
+  return Math.floor((Math.random()*max)+1);   
+  }
 
-var scores = []
-for(i = 0; i < 100; i++) {    
-    scores.push(Math.random()*10)
-}
-scores.sort(function(a,b) { return b-a })
-console.log(scores)
+  var scores = []
+  for(i = 0; i < 100; i++) {    
+  scores.push(Math.random()*10)
+  }
+  scores.sort(function(a,b) { return b-a })
+  console.log(scores)
 
-var circles = []
-var row = 0
+  var circles = []
+  var row = 0
 
-var max_in_row = 0
-var x = 0
-var y = RADIUS*scores[max_in_row]+PADDING
-for(var i = 0; i < scores.length; i++) {
-    var size = RADIUS*scores[i];
-    var width = x + size
-    if(width+size > MAX_WIDTH) {
-        x = RADIUS*scores[max_in_row]+PADDING
-        y += RADIUS*scores[i] + RADIUS*scores[max_in_row]+PADDING
-        max_in_row = i
-    } else {     
-        x = width
-    }
-    circles.push({
-            "size": size,
-            "x": x,
-            "y": y
-        });
-    x += size+PADDING
-}
-console.log(circles)
+  var max_in_row = 0
+  var x = 0
+  var y = RADIUS*scores[max_in_row]+PADDING
+  for(var i = 0; i < scores.length; i++) {
+  var size = RADIUS*scores[i];
+  var width = x + size
+  if(width+size > MAX_WIDTH) {
+  x = RADIUS*scores[max_in_row]+PADDING
+  y += RADIUS*scores[i] + RADIUS*scores[max_in_row]+PADDING
+  max_in_row = i
+  } else {     
+  x = width
+  }
+  circles.push({
+  "size": size,
+  "x": x,
+  "y": y
+  });
+  x += size+PADDING
+  }
+  console.log(circles)
 
-for(var i = 0; i < circles.length; i++) {
-    var c = circles[i]
-    fin = function () {
-            this.flag = r.popup(this.bar.x, this.bar.y, this.bar.value.toFixed(2) || "0").insertBefore(this);
-    },
-    fout = function () {
-       this.flag.animate({opacity: 0}, 300, function () {this.remove();});
-    };
-    c = r.circle(c.x, c.y, c.size)
-    c.hover(fin, fout)
-    c.attr("fill", "red")
-}
+  for(var i = 0; i < circles.length; i++) {
+  var c = circles[i]
+  fin = function () {
+  this.flag = r.popup(this.bar.x, this.bar.y, this.bar.value.toFixed(2) || "0").insertBefore(this);
+  },
+  fout = function () {
+  this.flag.animate({opacity: 0}, 300, function () {this.remove();});
+  };
+  c = r.circle(c.x, c.y, c.size)
+  c.hover(fin, fout)
+  c.attr("fill", "red")
+  }
 
-var r = Raphael("canvas");
-var MAX_WIDTH = 600
-var RADIUS = 5
-var PADDING = 4
+  var r = Raphael("canvas");
+  var MAX_WIDTH = 600
+  var RADIUS = 5
+  var PADDING = 4
 
-var random = function(max) {
-    return Math.floor((Math.random()*max)+1);   
-}
+  var random = function(max) {
+  return Math.floor((Math.random()*max)+1);   
+  }
 
-var scores = []
-for(i = 0; i < 100; i++) {    
-    scores.push(Math.random()*10)
-}
-scores.sort(function(a,b) { return b-a })
-console.log(scores)
+  var scores = []
+  for(i = 0; i < 100; i++) {    
+  scores.push(Math.random()*10)
+  }
+  scores.sort(function(a,b) { return b-a })
+  console.log(scores)
 
-var circles = []
-var row = 0
+  var circles = []
+  var row = 0
 
-var max_in_row = 0
-var x = 0
-var y = RADIUS*scores[max_in_row]+PADDING
-for(var i = 0; i < scores.length; i++) {
-    var size = RADIUS*scores[i];
-    var width = x + size
-    if(width+size > MAX_WIDTH) {
-        x = RADIUS*scores[max_in_row]+PADDING
-        y += RADIUS*scores[i] + RADIUS*scores[max_in_row]+PADDING
-        max_in_row = i
-    } else {     
-        x = width
-    }
-    circles.push({
-            "size": size,
-            "x": x,
-            "y": y
-        });
-    x += size+PADDING
-}
-console.log(circles)
+  var max_in_row = 0
+  var x = 0
+  var y = RADIUS*scores[max_in_row]+PADDING
+  for(var i = 0; i < scores.length; i++) {
+  var size = RADIUS*scores[i];
+  var width = x + size
+  if(width+size > MAX_WIDTH) {
+  x = RADIUS*scores[max_in_row]+PADDING
+  y += RADIUS*scores[i] + RADIUS*scores[max_in_row]+PADDING
+  max_in_row = i
+  } else {     
+  x = width
+  }
+  circles.push({
+  "size": size,
+  "x": x,
+  "y": y
+  });
+  x += size+PADDING
+  }
+  console.log(circles)
 
-for(var i = 0; i < circles.length; i++) {
-    var c = circles[i]
-    fin = function () {
-        this.attr("fill", "green")
-    },
-    fout = function () {
-      this.attr("fill", "red")
-    };
-    c = r.circle(c.x, c.y, c.size)
-    c.hover(fin, fout)
-    c.attr("fill", "red")
-}
+  for(var i = 0; i < circles.length; i++) {
+  var c = circles[i]
+  fin = function () {
+  this.attr("fill", "green")
+  },
+  fout = function () {
+  this.attr("fill", "red")
+  };
+  c = r.circle(c.x, c.y, c.size)
+  c.hover(fin, fout)
+  c.attr("fill", "red")
+  }
 
 
 */

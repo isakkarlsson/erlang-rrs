@@ -36,7 +36,7 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#585858', endColorstr='#464646',GradientType=0 ); /* IE6-9 */
 }
 
-
+.ui-autocomplete { height: 200px; overflow-y: scroll; overflow-x: hidden;}
 
 .top-menu {
     text-align: center;
@@ -271,6 +271,7 @@ a.method:hover {
 }
 
 .attributes {
+    table-layout: fixed;
     background-color: rgb(248, 248, 248);
     font-size: 12px;
     padding-left: 10px;
@@ -296,7 +297,8 @@ a.method:hover {
 }
 
 .attr-value {
-    width: 90%;
+    white-space: nowrap;
+    overflow:hidden;
 }
 
 .attr-progress {

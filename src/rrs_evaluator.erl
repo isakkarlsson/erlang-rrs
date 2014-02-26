@@ -1,15 +1,15 @@
 -module(rrs_evaluator).
 
 -export([
-	 init/3,
-	 websocket_init/3,
-	 websocket_handle/3,
-	 websocket_info/3,
-	 websocket_terminate/3,
+         init/3,
+         websocket_init/3,
+         websocket_handle/3,
+         websocket_info/3,
+         websocket_terminate/3,
 
-	 spawn_load_model/3,
-	 spawn_load_data/3
-	]).
+         spawn_load_model/3,
+         spawn_load_data/3
+        ]).
 
 %% @headerfile "rrs.hrl"
 -include("rrs.hrl").
@@ -34,7 +34,7 @@ websocket_handle_json(error, Req, State) ->
 websocket_handle_json(Obj, Req, State) ->
     Id = proplists:get_value(<<"id">>, Obj),
     Example = proplists:get_value(<<"example">>, Obj),
-    rr_log:info("~p ~s", [Id, Example]),
+%%    rr_log:info("~p ~s", [Id, Example]),
     Process = load_model(Id, Example),
     {ok, Req, Process}.
 
@@ -62,22 +62,23 @@ load_model(Id, Example) ->
 
 spawn_load_data(Parent, Id, Binary) ->
     process_flag(trap_exit, true),
-    Csv = {csv_reader, spawn_link(csv, parse_binary_incremental, [Binary, 1])},
+    Csv = {csv_reader, spawn_link(csv, parse_binary_incremental, [Binary, 1, false])},
     ExSet = rr_example:load(Csv, 4),
     Pid = spawn_link(?MODULE, spawn_load_model, [Parent, Id, ExSet#rr_exset.exconf]),
     receive
-	{'EXIT', _, terminate} ->
-	    rr_log:debug("terminating evaluator ~p", [Pid]),
-	    exit(Pid),
-	    csv:kill(Csv),
-	    rr_example:kill(ExSet),
-	    ok
+        {'EXIT', _, terminate} ->
+            rr_log:debug("terminating evaluator ~p", [Pid]),
+            exit(Pid),
+            csv:kill(Csv),
+            rr_example:kill(ExSet),
+            ok
     end.
 spawn_load_model(Parent, Id, ExConf) ->
     #rrs_experiment_data {
        model = ModelDump
       } = rrs_database:get_value(Id),
-    {Model, Conf} = rr_ensemble:load_model(rf:unserialize(ModelDump)),
+    {Module, Dump} = rr_system:unserialize_model(ModelDump),
+    {Model, Conf} = Module:unserialize(Dump),
     P = rf:predict(Conf, Model, 1, ExConf),
     Parent ! {completed, P}.
 
