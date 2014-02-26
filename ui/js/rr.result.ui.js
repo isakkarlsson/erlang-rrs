@@ -115,7 +115,8 @@ $(document).ready(function() {
             $("#use-model-dialog .attributes tr").show("fade")
         }, function() {
             $(this).text("Show all");
-            $("#use-model-dialog .attributes tr").hide("fade")
+            $("#use-model-dialog .attributes tr input").val("no")
+//            $("#use-model-dialog .attributes tr").hide("fade")
         });
         var table = $("#use-model-dialog .attributes").html("");
         var idx = 0
@@ -133,7 +134,7 @@ $(document).ready(function() {
         }
         $("#attribute-search").autocomplete({
             minLength: 1,
-            source: data.features,
+            source: data.features.sort(function(a, b) { return a.name.localeCompare(b.name)}),
             focus: function (event, ui) {
                 $("#attribute-search").val(ui.item.name)
                 return false
