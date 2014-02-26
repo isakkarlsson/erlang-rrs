@@ -50,34 +50,36 @@
     </div>
     <div id="use-model-dialog" style="display:none; text-align: left"
          title="Use Model to Classify Custom Example">
-      <div class="selector-lip">
+      <div class="selector-lip" style="padding: 2px; margin:0px">
         <h2>Attributes<sup class="help" help="Insert the values for this example">?</sup></h2>
-        <div class="inner-shadow" style="margin-bottom:10px">
-          <p style="padding: 5px; margin:2px">
-            <span id="attribute-search-text">Search for attributes:</span>
-            <input id="attribute-search" />
-            <input style="display:none" id="attribute-value" />
-            <a href="#" id="attributes-show-all" class="selector-button orange inner-shadow help" key="show-all"
-             help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
-              Show all
-            </a>
-          </p>
-        </div>
-        <table class="attributes inner-shadow">
-          
-        </table>
-        <div class="selector-lip-foot">
-          <a href="#" id="evaluate" class="selector-button confirm green inner-shadow help" key="evaluate"
-             help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
-            Evaluate
-          </a>
-        </div>
-        <div id="prediction-content" style="display:none; border-top: 1px solid rgba(0,0,0,0.32); padding: 7px; margin-top: 5px;">
-          <div id="predicted" class="inner-shadow green" 
-               style="text-align: center; color: #fff;text-shadow: rgb(0, 0, 0) 0px 1px 2px;">
+        <div class="inner-shadow" style="width:58%; float: left; margin-right: 5px">
+          <div style="margin-bottom:10px">
+            <p style="padding-left: 5px; margin:2px; text-align:center">
+              <span id="attribute-search-text">Search for attributes:</span>
+              <input id="attribute-search" />
+              <input style="display:none" id="attribute-value" />
+            </p>
+            <div class="selector-lip-foot">
+              <a href="#" id="attributes-show-all" class="selector-button confirm orange inner-shadow help" key="show-all"
+                 help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
+                Show all
+              </a>
+              <a href="#" id="evaluate" class="selector-button confirm green inner-shadow help" key="evaluate"
+                 help="Confirm attribute selection and continue to evaluation selection" style="color: #fff">
+                Evaluate
+              </a>
+            </div>
           </div>
-          <div id="prediction-result" style="widht:500px">
-            
+          <table class="attributes"> </table>
+        </div>
+        <div class="inner-shadow" style="width:40%; float:left">
+          <div id="prediction-content" style="display:none; padding: 7px; margin-top: 5px;">
+            <div id="predicted" class="inner-shadow green" 
+                 style="text-align: center; color: #fff;text-shadow: rgb(0, 0, 0) 0px 1px 2px;">
+            </div>
+            <div id="prediction-result" style="widht:500px">
+              
+            </div>
           </div>
         </div>
       </div>

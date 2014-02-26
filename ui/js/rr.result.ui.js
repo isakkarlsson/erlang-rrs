@@ -57,7 +57,6 @@ $(document).ready(function() {
             xhr.addEventListener("progress", function(evt){
                 if (evt.lengthComputable) {
                     var pc = evt.loaded / evt.total;
-                    console.log(pc);
                     $("#page-progress").progressbar("value", pc*100);
                     if(pc == 1) {
                         $("#page-progress").progressbar("option", "value", false);
@@ -77,7 +76,6 @@ $(document).ready(function() {
             } else {
                 handleModel(data.data);
                 handleResult(data.data);
-                console.log(data);
                 $("title").text("rrs - result for '" + data.data.file.name + "'");
                 $.unblockUI();
             }},
@@ -94,7 +92,7 @@ $(document).ready(function() {
                     modal: true,
                     closeOnEscape: false,
                     autoResize:true,
-                    width: 500,
+                    width: 900,
                     position: {
                         my: "center top",
                         at: "center bottom",
@@ -128,7 +126,7 @@ $(document).ready(function() {
                 table.append("<tr style='display:none' id='feature_" + id + "_" + feature.name.replace(" ", "_") + "'>" +
                              "<td class='attr-key'>" + feature.name + "</td>" + 
                              "<td class='attr-type'>" + feature.type + "</td>" + 
-                             "<td class='attr-value'><input type='text' value='" + value + "'/></td>" +
+                             "<td class='attr-value'><input size='8' type='text' value='" + value + "'/></td>" +
                              "</tr>");
             })(data.features[f], ++idx)
         }
@@ -167,7 +165,7 @@ $(document).ready(function() {
         $("#evaluate").click(function() {
             rr.client("ws://" + window.location.host + "/api/evaluator", {
                 message: function (data) {
-                    console.log(data);
+
                 },
                 complete: function(data) {
                     $("#prediction-content").hide("blind").show("blind");
@@ -211,7 +209,6 @@ $(document).ready(function() {
         }));
         values.push("unkown");
         var combined = types.join() + "\r\n" + names.join() + "\r\n" + values.join() + "\r\n";
-        console.log(combined);
         return combined;
 
         /* "numeric, numeric, numeric, numeric, class\r\n"+
@@ -246,7 +243,6 @@ $(document).ready(function() {
         hitchart(data.predictions, $("#scatter-slide").slider("value"), $("#only-predictions").prop("checked"));
         var v = data.predictions.predictions.length > 100 ? 100 : data.predictions.predictions.length;
         $("#histogram-slide-count").text(v + "/" + data.predictions.predictions.length);
-        console.log(v);
         $("#histogram-slide").slider({
             range: "min",
             value: v,
@@ -263,7 +259,6 @@ $(document).ready(function() {
 
     function vi(score) {
         var r = Raphael("vi");
-        console.log("Showing variable importance")
         r.ball(100, 0, 700, 700, score, {})
     }
 
@@ -286,8 +281,6 @@ $(document).ready(function() {
             }
             hist.push(h_ex);
         }
-        console.log(seq(0, hist[0].length*10-10, 10));
-        console.log(hist);
         var r = Raphael("histogram");
         var c = r.linechart(40, 10, 620, 500, seq(0, hist[0].length*10-10, 10), hist, {
             axis: "0 0 1 1",
